@@ -417,23 +417,15 @@ function SubmitButton({ attendanceId }: { attendanceId: string }) {
 	const [lastPending, setLastPending] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 
-	const [resetTime, setResetTime] = useState(0);
-
 	if (lastPending !== pending) {
 		setIsSuccess(!pending);
 		setLastPending(pending);
 	}
 
-	useEffect(() => {
-		if (isSuccess) {
-			const timeOut = setTimeout(() => {
-				dispatch({ type: "RESET_ALL" });
-				setIsSuccess(false);
-			}, 5000);
-
-			return () => clearTimeout(timeOut);
-		}
-	}, [isSuccess, dispatch]);
+	function resetForm() {
+		dispatch({ type: "RESET_ALL" });
+		setIsSuccess(false);
+	}
 
 	const isComplete = isActivityComplete(state);
 	if (!isComplete) {
@@ -442,8 +434,6 @@ function SubmitButton({ attendanceId }: { attendanceId: string }) {
 
 	async function handleSubmit() {
 		startTransition(async () => {
-			setResetTime(Date.now() + 5000);
-
 			await action_submitActivity(state, attendanceId);
 		});
 	}
@@ -469,16 +459,23 @@ function SubmitButton({ attendanceId }: { attendanceId: string }) {
 				{isSuccess && <Check className="w-4 h-4 ml-2" />}
 			</button>
 
-			{isSuccess && <SuccessMessage resetTime={resetTime} />}
+			{isSuccess && <SuccessMessage handleReset={resetForm} />}
 		</div>
 	);
 }
 
-function SuccessMessage({ resetTime }: { resetTime: number }) {
+function SuccessMessage({ handleReset }: { handleReset: () => void }) {
 	const { dispatch } = useActivity();
+	const [resetTime] = useState(Date.now() + 5000);
 	const now = useNow();
 
 	const secondsLeft = Math.floor(Math.max(resetTime - now, 0) / 1000);
+
+	useEffect(() => {
+		if (now >= resetTime) {
+			handleReset();
+		}
+	}, [now, resetTime, handleReset]);
 
 	return (
 		<div className="flex items-center justify-center gap-2">
