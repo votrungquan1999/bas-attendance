@@ -23,5 +23,10 @@ export type Taker = {
 };
 
 export async function getTakers() {
-	return takers;
+	const testUser = {
+		id: "test_user",
+		value: "Test User",
+	};
+
+	return [...takers, testUser];
 }
