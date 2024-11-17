@@ -18,9 +18,9 @@ import type {
 import { useActivity } from "./ActivityContext";
 import { cn } from "src/shadcn/lib/utils";
 import { isActivityComplete } from "./activityValidation";
-import { useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import action_submitActivity from "./action_submitActivity";
-import { Loader2 } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 
 export default function AddNewActivitySection({
 	attendanceId,
@@ -40,7 +40,7 @@ export default function AddNewActivitySection({
 						What activity did you do today?
 					</label>
 					<Select
-						value={state.activity}
+						value={state.activity ?? ""}
 						onValueChange={(value) =>
 							dispatch({ type: "SET_ACTIVITY", payload: value as Activity })
 						}
@@ -386,30 +386,107 @@ function NormalLongSession() {
 }
 
 function SubmitButton({ attendanceId }: { attendanceId: string }) {
-	const { state } = useActivity();
+	const { state, dispatch } = useActivity();
+
 	const [pending, startTransition] = useTransition();
+	const [lastPending, setLastPending] = useState(false);
+	const [isSuccess, setIsSuccess] = useState(false);
+
+	const [resetTime, setResetTime] = useState(0);
+
+	if (lastPending !== pending) {
+		setIsSuccess(!pending);
+		setLastPending(pending);
+	}
+
+	useEffect(() => {
+		let timeout: Timer;
+
+		if (isSuccess) {
+			timeout = setTimeout(() => {
+				dispatch({ type: "RESET_ALL" });
+				setIsSuccess(false);
+			}, 5000);
+		}
+
+		return () => clearTimeout(timeout);
+	}, [isSuccess, dispatch]);
 
 	const isComplete = isActivityComplete(state);
+	if (!isComplete) {
+		return null;
+	}
 
 	async function handleSubmit() {
 		startTransition(async () => {
+			setResetTime(Date.now() + 5000);
+
 			await action_submitActivity(state, attendanceId);
 		});
 	}
 
 	return (
-		<button
-			type="submit"
-			className={cn(
-				"w-full p-4 rounded-lg font-semibold transition-all duration-200 bg-blue-500 hover:bg-blue-600 text-white shadow-sm flex items-center justify-center",
-				!isComplete && "invisible",
-				pending && "animate-pulse opacity-50",
-			)}
-			disabled={pending}
-			onClick={handleSubmit}
-		>
-			{pending ? "Submitting..." : "Submit Activity"}
-			{pending && <Loader2 className="w-4 h-4 animate-spin ml-2" />}
-		</button>
+		<div className="space-y-2">
+			<button
+				type="submit"
+				className={cn(
+					"w-full px-4 py-2 rounded-lg font-semibold transition-all duration-200 bg-blue-500 hover:bg-blue-600 text-white shadow-sm flex items-center justify-center",
+					pending && "animate-pulse opacity-50",
+					isSuccess && "bg-emerald-500 hover:bg-emerald-600",
+				)}
+				disabled={pending}
+				onClick={handleSubmit}
+			>
+				{(() => {
+					if (isSuccess) return "Submitted!";
+					if (pending) return "Submitting...";
+					return "Submit Activity";
+				})()}
+				{pending && <Loader2 className="w-4 h-4 animate-spin ml-2" />}
+				{isSuccess && <Check className="w-4 h-4 ml-2" />}
+			</button>
+
+			{isSuccess && <SuccessMessage resetTime={resetTime} />}
+		</div>
 	);
+}
+
+function SuccessMessage({ resetTime }: { resetTime: number }) {
+	const { dispatch } = useActivity();
+	const now = useNow();
+
+	const secondsLeft = Math.floor(Math.max(resetTime - now, 0) / 1000);
+
+	return (
+		<div className="flex items-center justify-center gap-2">
+			<p className="text-center text-sm text-gray-600">
+				Form will reset in {secondsLeft} seconds...
+			</p>
+			<button
+				type="button"
+				className="text-blue-500 hover:text-blue-600 underline text-sm"
+				onClick={() => dispatch({ type: "RESET_ALL" })}
+			>
+				Reset now
+			</button>
+		</div>
+	);
+}
+
+export function useNow() {
+	const [now, setNow] = useState(Date.now());
+
+	useEffect(() => {
+		let raf: number;
+
+		function updateNow() {
+			raf = requestAnimationFrame(updateNow);
+			setNow(Date.now());
+		}
+		updateNow();
+
+		return () => cancelAnimationFrame(raf);
+	}, []);
+
+	return now;
 }
