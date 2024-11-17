@@ -46,7 +46,7 @@ export default async function ActivityPage() {
 				</div>
 			</header>
 
-			<AddNewActivitySection />
+			<AddNewActivitySection attendanceId={takerId} />
 		</main>
 	);
 }

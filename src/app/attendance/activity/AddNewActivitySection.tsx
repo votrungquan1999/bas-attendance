@@ -17,8 +17,16 @@ import type {
 } from "./ActivityContext";
 import { useActivity } from "./ActivityContext";
 import { cn } from "src/shadcn/lib/utils";
+import { isActivityComplete } from "./activityValidation";
+import { useTransition } from "react";
+import action_submitActivity from "./action_submitActivity";
+import { Loader2 } from "lucide-react";
 
-export default function AddNewActivitySection() {
+export default function AddNewActivitySection({
+	attendanceId,
+}: {
+	attendanceId: string;
+}) {
 	const { state, dispatch } = useActivity();
 
 	return (
@@ -70,7 +78,7 @@ export default function AddNewActivitySection() {
 				</div>
 			</div>
 
-			<SubmitButton />
+			<SubmitButton attendanceId={attendanceId} />
 		</div>
 	);
 }
@@ -377,21 +385,31 @@ function NormalLongSession() {
 	);
 }
 
-function SubmitButton() {
+function SubmitButton({ attendanceId }: { attendanceId: string }) {
 	const { state } = useActivity();
-
+	const [pending, startTransition] = useTransition();
 
 	const isComplete = isActivityComplete(state);
+
+	async function handleSubmit() {
+		startTransition(async () => {
+			await action_submitActivity(state, attendanceId);
+		});
+	}
 
 	return (
 		<button
 			type="submit"
 			className={cn(
-				"w-full p-4 rounded-lg font-semibold transition-all duration-200 bg-blue-500 hover:bg-blue-600 text-white shadow-sm",
-				!isComplete() && "invisible",
+				"w-full p-4 rounded-lg font-semibold transition-all duration-200 bg-blue-500 hover:bg-blue-600 text-white shadow-sm flex items-center justify-center",
+				!isComplete && "invisible",
+				pending && "animate-pulse opacity-50",
 			)}
+			disabled={pending}
+			onClick={handleSubmit}
 		>
-			Submit Activity
+			{pending ? "Submitting..." : "Submit Activity"}
+			{pending && <Loader2 className="w-4 h-4 animate-spin ml-2" />}
 		</button>
 	);
 }

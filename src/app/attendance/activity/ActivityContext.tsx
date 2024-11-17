@@ -17,18 +17,18 @@ export type NormalSessionActivity =
 	| "train-with-coach"
 	| "others";
 
-interface ActivityState {
+export interface ActivityState {
 	// Main activity
 	activity?: Activity;
 
 	// 30 Minutes Session
 	thirtyMinActivity?: ThirtyMinutesSessionActivity;
-	thirtyMinExplanation: string;
+	thirtyMinExplanation?: string;
 
 	// Probability Practice
 	practiceType?: ProbabilityActivity;
 	practiceLevel?: string;
-	practiceDescription: string;
+	practiceDescription?: string;
 
 	// Endurance Run
 	laps?: string;
@@ -36,7 +36,7 @@ interface ActivityState {
 
 	// Normal Long Session
 	sessionType?: NormalSessionActivity;
-	sessionExplanation: string;
+	sessionExplanation?: string;
 }
 
 type ActionType =
@@ -55,14 +55,14 @@ type ActionType =
 const initialState: ActivityState = {
 	activity: undefined,
 	thirtyMinActivity: undefined,
-	thirtyMinExplanation: "",
+	thirtyMinExplanation: undefined,
 	practiceType: undefined,
 	practiceLevel: undefined,
-	practiceDescription: "",
+	practiceDescription: undefined,
 	laps: undefined,
 	minutes: undefined,
 	sessionType: undefined,
-	sessionExplanation: "",
+	sessionExplanation: undefined,
 };
 
 function activityReducer(
