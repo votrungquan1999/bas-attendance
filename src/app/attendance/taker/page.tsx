@@ -14,9 +14,7 @@ import { action_handleSelectTaker } from "./action_handleSelectTaker";
 
 export default async function TakerPage() {
 	const cookieStore = await cookies();
-
 	const cookieTaker = cookieStore.get("taker");
-
 	const takers = await getTakers();
 
 	if (cookieTaker && takers.some((t) => t.id === cookieTaker.value)) {
@@ -24,49 +22,56 @@ export default async function TakerPage() {
 	}
 
 	return (
-		<div className="flex flex-col justify-center flex-1">
-			<div className="flex justify-center">
-				<ComboboxRoot
-					defaultSelectedItemKey="1"
-					handleSelectItem={action_handleSelectTaker}
-				>
-					<ComboboxPopover>
-						<ComboboxTrigger
-							placeholder={<span className="text-slate-500">You are:</span>}
-						/>
-						<ComboboxContent
-							inputPlaceholder="Search your name…"
-							emptyNode="Not found."
-						>
-							<ComboboxGroup>
-								{takers.map((taker) => {
-									const nonAccentName = toNonAccentVietnamese(taker.value);
+		<div className="flex flex-1 flex-col items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100">
+			<div className="w-full max-w-md space-y-6 rounded-lg bg-white p-8 shadow-lg">
+				<h1 className="text-center text-2xl font-semibold text-slate-800">
+					You are:
+				</h1>
 
-									// TODO: add this back after testing
-									// if (taker.id === "test_user") {
-									// 	return (
-									// 		<ComboboxItem
-									// 			key={taker.id}
-									// 			value={`${taker.id}-${taker.value}-${nonAccentName}`}
-									// 		>
-									// 			{""}
-									// 		</ComboboxItem>
-									// 	);
-									// }
+				<div className="relative w-full">
+					<ComboboxRoot
+						defaultSelectedItemKey="1"
+						handleSelectItem={action_handleSelectTaker}
+					>
+						<ComboboxPopover>
+							<ComboboxTrigger
+								className="w-full transition-all hover:border-slate-400 focus:ring-2 focus:ring-slate-200"
+								placeholder={
+									<span className="text-slate-500">Select your name...</span>
+								}
+							/>
+							<ComboboxContent
+								className="max-h-[300px] overflow-y-auto rounded-md border border-slate-200 bg-white shadow-lg"
+								inputPlaceholder="Type to search..."
+								emptyNode={
+									<div className="p-4 text-center text-slate-500">
+										No matching names found
+									</div>
+								}
+							>
+								<ComboboxGroup>
+									{takers.map((taker) => {
+										const nonAccentName = toNonAccentVietnamese(taker.value);
 
-									return (
-										<ComboboxItem
-											key={taker.id}
-											value={`${taker.id}-${taker.value}-${nonAccentName}`}
-										>
-											{taker.value}
-										</ComboboxItem>
-									);
-								})}
-							</ComboboxGroup>
-						</ComboboxContent>
-					</ComboboxPopover>
-				</ComboboxRoot>
+										return (
+											<ComboboxItem
+												key={taker.id}
+												value={`${taker.id}-${taker.value}-${nonAccentName}`}
+												className="cursor-pointer px-4 py-2 hover:bg-slate-100"
+											>
+												{taker.value}
+											</ComboboxItem>
+										);
+									})}
+								</ComboboxGroup>
+							</ComboboxContent>
+						</ComboboxPopover>
+					</ComboboxRoot>
+				</div>
+
+				<p className="text-center text-sm text-slate-500">
+					Can&apos;t find your name? Please contact your administrator.
+				</p>
 			</div>
 		</div>
 	);

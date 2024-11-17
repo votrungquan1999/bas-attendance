@@ -218,7 +218,7 @@ export function ComboboxContent({
 	className?: string;
 }) {
 	return (
-		<PopoverContent className={cn("w-[200px] p-0 bg-white", className)}>
+		<PopoverContent className={cn("p-0 bg-white", className)}>
 			<Command>
 				<CommandInput placeholder={inputPlaceholder} />
 				<CommandEmpty>{emptyNode}</CommandEmpty>
@@ -236,9 +236,11 @@ export function ComboboxGroup({ children }: { children: React.ReactNode }) {
 export function ComboboxItem({
 	children,
 	value,
+	className,
 }: {
 	children: React.ReactNode;
 	value: string;
+	className?: string;
 }) {
 	const { selectedItemKey } = useState();
 
@@ -263,7 +265,7 @@ export function ComboboxItem({
 	};
 
 	return (
-		<CommandItem onSelect={handleSelect} value={value}>
+		<CommandItem onSelect={handleSelect} value={value} className={className}>
 			<Check
 				className={cn("mr-2 h-4 w-4", value !== selectedItemKey && "invisible")}
 			/>
