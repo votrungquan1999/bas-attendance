@@ -161,10 +161,8 @@ export function ComboboxTrigger({
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		let timeoutId: Timer;
-
 		if (isSuccess) {
-			timeoutId = setTimeout(() => {
+			const timeoutId = setTimeout(() => {
 				dispatch({ action: "success_display_too_long" });
 			}, 5000);
 

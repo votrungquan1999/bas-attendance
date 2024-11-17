@@ -400,16 +400,14 @@ function SubmitButton({ attendanceId }: { attendanceId: string }) {
 	}
 
 	useEffect(() => {
-		let timeout: Timer;
-
 		if (isSuccess) {
-			timeout = setTimeout(() => {
+			const timeOut = setTimeout(() => {
 				dispatch({ type: "RESET_ALL" });
 				setIsSuccess(false);
 			}, 5000);
-		}
 
-		return () => clearTimeout(timeout);
+			return () => clearTimeout(timeOut);
+		}
 	}, [isSuccess, dispatch]);
 
 	const isComplete = isActivityComplete(state);
