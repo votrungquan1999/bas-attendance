@@ -20,6 +20,10 @@ export default {
 				md: "calc(var(--radius) - 2px)",
 				sm: "calc(var(--radius) - 4px)",
 			},
+			fontFamily: {
+				satisfy: ["var(--font-satisfy)", "cursive"],
+				inter: ["var(--font-inter)", "sans-serif"],
+			},
 		},
 	},
 	plugins: [tailwindcssAnimate],

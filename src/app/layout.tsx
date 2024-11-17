@@ -1,5 +1,17 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Satisfy, Inter } from "next/font/google";
+
+const satisfy = Satisfy({
+	subsets: ["latin"],
+	weight: "400",
+	variable: "--font-satisfy",
+});
+
+const inter = Inter({
+	subsets: ["latin"],
+	variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
 	title: "BasAttendance",
@@ -12,8 +24,8 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
-			<body className="min-h-dvh flex">{children}</body>
+		<html lang="en" className={`${satisfy.variable} ${inter.variable}`}>
+			<body className="min-h-dvh flex font-inter">{children}</body>
 		</html>
 	);
 }

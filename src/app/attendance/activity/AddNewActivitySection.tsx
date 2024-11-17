@@ -16,45 +16,61 @@ import type {
 	NormalSessionActivity,
 } from "./ActivityContext";
 import { useActivity } from "./ActivityContext";
+import { cn } from "src/shadcn/lib/utils";
 
 export default function AddNewActivitySection() {
 	const { state, dispatch } = useActivity();
 
 	return (
-		<div className="max-w-2xl mx-auto p-6 space-y-8 min-h-[700px]">
-			<div className="space-y-2">
-				<label htmlFor="main-activity" className="text-lg font-semibold">
-					What activity did you do today?
-				</label>
-				<Select
-					value={state.activity}
-					onValueChange={(value) =>
-						dispatch({ type: "SET_ACTIVITY", payload: value as Activity })
-					}
-				>
-					<SelectTrigger id="main-activity" className="w-full max-w-sm">
-						<SelectValue placeholder="Select an activity" />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectGroup>
-							<SelectLabel>Activities</SelectLabel>
-							<SelectItem value="30-minutes-session">
-								30 minutes session
-							</SelectItem>
-							<SelectItem value="endurance-run">Endurance run</SelectItem>
-							<SelectItem value="normal-long-session">
-								Normal long session
-							</SelectItem>
-						</SelectGroup>
-					</SelectContent>
-				</Select>
+		<div className="max-w-2xl mx-auto p-6 space-y-8">
+			<div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+				<div className="space-y-2">
+					<label
+						htmlFor="main-activity"
+						className="text-lg font-semibold text-gray-900"
+					>
+						What activity did you do today?
+					</label>
+					<Select
+						value={state.activity}
+						onValueChange={(value) =>
+							dispatch({ type: "SET_ACTIVITY", payload: value as Activity })
+						}
+					>
+						<SelectTrigger id="main-activity" className="w-full">
+							<SelectValue placeholder="Select an activity" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Activities</SelectLabel>
+								<SelectItem value="30-minutes-session">
+									30 minutes session
+								</SelectItem>
+								<SelectItem value="endurance-run">Endurance run</SelectItem>
+								<SelectItem value="normal-long-session">
+									Normal long session
+								</SelectItem>
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+				</div>
+
+				<div className="mt-6">
+					{state.activity && (
+						<div className="border-t pt-6">
+							{state.activity === "30-minutes-session" && (
+								<ThirtyMinutesSession />
+							)}
+							{state.activity === "endurance-run" && <EnduranceRun />}
+							{state.activity === "normal-long-session" && (
+								<NormalLongSession />
+							)}
+						</div>
+					)}
+				</div>
 			</div>
 
-			<div className="mt-6">
-				{state.activity === "30-minutes-session" && <ThirtyMinutesSession />}
-				{state.activity === "endurance-run" && <EnduranceRun />}
-				{state.activity === "normal-long-session" && <NormalLongSession />}
-			</div>
+			<SubmitButton />
 		</div>
 	);
 }
@@ -358,5 +374,49 @@ function NormalLongSession() {
 				</div>
 			)}
 		</div>
+	);
+}
+
+function SubmitButton() {
+	const { state } = useActivity();
+
+	const isComplete = () => {
+		switch (state.activity) {
+			case "30-minutes-session":
+				if (!state.thirtyMinActivity) return false;
+				if (state.thirtyMinActivity === "probability-practice") {
+					return !!(
+						state.practiceType &&
+						state.practiceLevel &&
+						state.practiceDescription
+					);
+				}
+				return !!state.thirtyMinExplanation;
+
+			case "endurance-run":
+				return state.laps && state.minutes;
+
+			case "normal-long-session":
+				if (!state.sessionType) return false;
+				if (state.sessionType === "others") {
+					return !!state.sessionExplanation;
+				}
+				return true;
+
+			default:
+				return false;
+		}
+	};
+
+	return (
+		<button
+			type="submit"
+			className={cn(
+				"w-full p-4 rounded-lg font-semibold transition-all duration-200 bg-blue-500 hover:bg-blue-600 text-white shadow-sm",
+				!isComplete() && "invisible",
+			)}
+		>
+			Submit Activity
+		</button>
 	);
 }

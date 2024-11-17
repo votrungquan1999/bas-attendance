@@ -6,25 +6,11 @@ import {
 	ComboboxItem,
 	ComboboxPopover,
 } from "src/shadcn/components/behaviors/comboBox";
-import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import toNonAccentVietnamese from "src/helpers/toNonAccentVietnamese";
 import { getTakers } from "./getTakers";
-
-async function handleSelectTaker(value: string) {
-	"use server";
-
-	const cookieStore = await cookies();
-
-	const [id] = value.split("-");
-
-	if (!id) return;
-
-	cookieStore.set("taker", id);
-
-	revalidatePath("/");
-}
+import { action_handleSelectTaker } from "./action_handleSelectTaker";
 
 export default async function TakerPage() {
 	const cookieStore = await cookies();
@@ -42,7 +28,7 @@ export default async function TakerPage() {
 			<div className="flex justify-center">
 				<ComboboxRoot
 					defaultSelectedItemKey="1"
-					handleSelectItem={handleSelectTaker}
+					handleSelectItem={action_handleSelectTaker}
 				>
 					<ComboboxPopover>
 						<ComboboxTrigger
