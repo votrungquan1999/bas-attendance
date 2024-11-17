@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Satisfy, Inter } from "next/font/google";
+import AuthWrapper from "./components/AuthWrapper";
 
 const satisfy = Satisfy({
 	subsets: ["latin"],
@@ -25,7 +26,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" className={`${satisfy.variable} ${inter.variable}`}>
-			<body className="min-h-dvh flex font-inter">{children}</body>
+			<body className="min-h-dvh flex font-inter">
+				<AuthWrapper>{children}</AuthWrapper>
+			</body>
 		</html>
 	);
 }
