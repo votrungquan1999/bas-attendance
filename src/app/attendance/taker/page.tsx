@@ -42,16 +42,17 @@ export default async function TakerPage() {
 								{takers.map((taker) => {
 									const nonAccentName = toNonAccentVietnamese(taker.value);
 
-									if (taker.id === "test_user") {
-										return (
-											<ComboboxItem
-												key={taker.id}
-												value={`${taker.id}-${taker.value}-${nonAccentName}`}
-											>
-												{""}
-											</ComboboxItem>
-										);
-									}
+									// TODO: add this back after testing
+									// if (taker.id === "test_user") {
+									// 	return (
+									// 		<ComboboxItem
+									// 			key={taker.id}
+									// 			value={`${taker.id}-${taker.value}-${nonAccentName}`}
+									// 		>
+									// 			{""}
+									// 		</ComboboxItem>
+									// 	);
+									// }
 
 									return (
 										<ComboboxItem
