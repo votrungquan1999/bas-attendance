@@ -154,7 +154,7 @@ export function ComboboxTrigger({
 	placeholder,
 	className,
 }: {
-	placeholder: string;
+	placeholder: React.ReactNode;
 	className?: string;
 }) {
 	const { isPending, isSuccess, open, selectedItemDisplay } = useState();
