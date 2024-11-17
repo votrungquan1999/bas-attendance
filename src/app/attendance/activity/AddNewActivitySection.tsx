@@ -46,7 +46,11 @@ export default function AddNewActivitySection({
 						}
 					>
 						<SelectTrigger id="main-activity" className="w-full">
-							<SelectValue placeholder="Select an activity" />
+							<SelectValue
+								placeholder={
+									<span className="text-slate-500">Select an activity</span>
+								}
+							/>
 						</SelectTrigger>
 						<SelectContent>
 							<SelectGroup>
@@ -104,11 +108,12 @@ function ThirtyMinutesSession() {
 						})
 					}
 				>
-					<SelectTrigger
-						id="thirty-minutes-activity"
-						className="w-full max-w-sm"
-					>
-						<SelectValue placeholder="Select an activity" />
+					<SelectTrigger id="thirty-minutes-activity" className="w-full">
+						<SelectValue
+							placeholder={
+								<span className="text-slate-500">Select an activity</span>
+							}
+						/>
 					</SelectTrigger>
 					<SelectContent>
 						<SelectGroup>
@@ -198,8 +203,12 @@ function ProbabilityPractice() {
 						})
 					}
 				>
-					<SelectTrigger id="practice-type" className="w-full max-w-sm">
-						<SelectValue placeholder="Select practice type" />
+					<SelectTrigger id="practice-type" className="w-full">
+						<SelectValue
+							placeholder={
+								<span className="text-slate-500">Select practice type</span>
+							}
+						/>
 					</SelectTrigger>
 					<SelectContent>
 						<SelectGroup>
@@ -224,8 +233,12 @@ function ProbabilityPractice() {
 								dispatch({ type: "SET_PRACTICE_LEVEL", payload: value })
 							}
 						>
-							<SelectTrigger id="practice-level" className="w-full max-w-sm">
-								<SelectValue placeholder="Select your level" />
+							<SelectTrigger id="practice-level" className="w-full">
+								<SelectValue
+									placeholder={
+										<span className="text-slate-500">Select your level</span>
+									}
+								/>
 							</SelectTrigger>
 							<SelectContent>
 								<SelectGroup>
@@ -282,8 +295,12 @@ function EnduranceRun() {
 						dispatch({ type: "SET_LAPS", payload: value })
 					}
 				>
-					<SelectTrigger id="laps-count" className="w-full max-w-sm">
-						<SelectValue placeholder="Number of laps" />
+					<SelectTrigger id="laps-count" className="w-full">
+						<SelectValue
+							placeholder={
+								<span className="text-slate-500">Number of laps</span>
+							}
+						/>
 					</SelectTrigger>
 					<SelectContent>
 						<SelectGroup>
@@ -308,8 +325,12 @@ function EnduranceRun() {
 						dispatch({ type: "SET_MINUTES", payload: value })
 					}
 				>
-					<SelectTrigger id="completion-time" className="w-full max-w-sm">
-						<SelectValue placeholder="Duration (minutes)" />
+					<SelectTrigger id="completion-time" className="w-full">
+						<SelectValue
+							placeholder={
+								<span className="text-slate-500">Duration (minutes)</span>
+							}
+						/>
 					</SelectTrigger>
 					<SelectContent>
 						<SelectGroup>
@@ -345,8 +366,12 @@ function NormalLongSession() {
 						})
 					}
 				>
-					<SelectTrigger id="session-type" className="w-full max-w-sm">
-						<SelectValue placeholder="Select activity" />
+					<SelectTrigger id="session-type" className="w-full">
+						<SelectValue
+							placeholder={
+								<span className="text-slate-500">Select activity</span>
+							}
+						/>
 					</SelectTrigger>
 					<SelectContent>
 						<SelectGroup>
