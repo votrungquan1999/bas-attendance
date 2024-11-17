@@ -380,33 +380,8 @@ function NormalLongSession() {
 function SubmitButton() {
 	const { state } = useActivity();
 
-	const isComplete = () => {
-		switch (state.activity) {
-			case "30-minutes-session":
-				if (!state.thirtyMinActivity) return false;
-				if (state.thirtyMinActivity === "probability-practice") {
-					return !!(
-						state.practiceType &&
-						state.practiceLevel &&
-						state.practiceDescription
-					);
-				}
-				return !!state.thirtyMinExplanation;
 
-			case "endurance-run":
-				return state.laps && state.minutes;
-
-			case "normal-long-session":
-				if (!state.sessionType) return false;
-				if (state.sessionType === "others") {
-					return !!state.sessionExplanation;
-				}
-				return true;
-
-			default:
-				return false;
-		}
-	};
+	const isComplete = isActivityComplete(state);
 
 	return (
 		<button
