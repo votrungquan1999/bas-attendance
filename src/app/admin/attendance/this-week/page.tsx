@@ -4,6 +4,10 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "src/shadcn/components/ui/popover";
+// import { useState } from "react";
+// import { Button } from "src/shadcn/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { connection } from "next/server";
 
 // Mock data for demonstration
 const mockAttendanceData: {
@@ -296,7 +300,6 @@ function getActivityDescription(activity: CompletedActivity): string {
 			return sessionTypeMap[activity.sessionType];
 		}
 	}
-	return "Unknown activity";
 }
 
 function groupActivities(activities: CompletedActivity[]) {
@@ -537,12 +540,90 @@ function NormalSessionProgress({
 	);
 }
 
-export default function ThisWeekPage() {
+/**
+ * Calculates the start and end dates of a week based on a week offset
+ * @param weekOffset - Number of weeks to offset from current week (negative for past weeks)
+ * @returns Object containing start date (Monday) and end date (Sunday) of the specified week
+ *
+ * Examples:
+ * - weekOffset = 0: Current week
+ * - weekOffset = -1: Last week
+ * - weekOffset = -2: Two weeks ago
+ *
+ * Note: Week starts on Monday and ends on Sunday, using Asia/Saigon timezone
+ */
+async function getWeekRange(weekOffset = 0) {
+	await connection();
+
+	// Create date in Asia/Saigon timezone
+	const today = new Date(
+		new Date().toLocaleString("en-US", { timeZone: "Asia/Saigon" }),
+	);
+
+	// Calculate start of week (Monday)
+	const startOfWeek = new Date(today);
+	const currentDay = today.getDay();
+	// Convert Sunday (0) to 7 for easier calculation
+	const daysFromMonday = currentDay === 0 ? 7 : currentDay;
+	// Subtract days to get to Monday, then add offset weeks
+	startOfWeek.setDate(today.getDate() - (daysFromMonday - 1) + weekOffset * 7);
+	startOfWeek.setHours(0, 0, 0, 0);
+
+	// Calculate end of week (Sunday)
+	const endOfWeek = new Date(startOfWeek);
+	// Add 6 days to Monday to get to Sunday
+	endOfWeek.setDate(startOfWeek.getDate() + 6);
+	endOfWeek.setHours(23, 59, 59, 999);
+
+	return {
+		start: startOfWeek,
+		end: endOfWeek,
+	};
+}
+
+export default async function ThisWeekPage() {
+	// const [weekOffset, setWeekOffset] = useState(0);
+	const weekRange = await getWeekRange(0);
+
+	// Filter activities for the selected week
+	const filteredData = mockAttendanceData.map((athlete) => ({
+		...athlete,
+		activities: athlete.activities.filter((activity) => {
+			const activityDate = new Date(activity.submittedAt);
+			return activityDate >= weekRange.start && activityDate <= weekRange.end;
+		}),
+	}));
+
 	return (
 		<div className="p-6">
-			<h1 className="text-2xl font-bold mb-4">This Week&apos;s Attendance</h1>
+			<div className="flex justify-between items-center mb-4">
+				<h1 className="text-2xl font-bold">Attendance</h1>
+				<div className="flex items-center gap-2">
+					<button
+						type="button"
+						className="flex items-center gap-1 text-sm hover:bg-gray-50 p-1 rounded"
+						// onClick={() => setWeekOffset((prev) => prev - 1)}
+					>
+						<ChevronLeft className="h-4 w-4 mr-1" />
+						Previous Week
+					</button>
+					<div className="text-sm font-medium">
+						{weekRange.start.toLocaleDateString()} -{" "}
+						{weekRange.end.toLocaleDateString()}
+					</div>
+					<button
+						type="button"
+						className="flex items-center gap-1 text-sm hover:bg-gray-50 p-1 rounded"
+						// onClick={() => setWeekOffset((prev) => prev + 1)}
+						// disabled={weekOffset >= 0}
+					>
+						Next Week
+						<ChevronRight className="h-4 w-4 ml-1" />
+					</button>
+				</div>
+			</div>
 			<div className="space-y-6">
-				{mockAttendanceData.map((athlete) => {
+				{filteredData.map((athlete) => {
 					const groupedActivities = groupActivities(athlete.activities);
 
 					return (
