@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import CodeAuthWrapper from "../components/CodeAuthWrapper";
+import CodeAuthWrapper from "src/components/CodeAuthWrapper";
 
 export default function AttendanceLayout({
 	children,
