@@ -12,6 +12,7 @@ export type NormalSessionActivity =
 	| "train-newbies"
 	| "train-with-coach"
 	| "others";
+export type PracticeLevel = "1" | "2" | "3" | "4";
 
 // Base type for all completed activities
 export interface BaseCompletedActivity {
@@ -25,7 +26,7 @@ export interface CompletedProbabilityPractice extends BaseCompletedActivity {
 	activity: "30-minutes-session";
 	thirtyMinActivity: "probability-practice";
 	practiceType: ProbabilityActivity;
-	practiceLevel: string;
+	practiceLevel: PracticeLevel;
 	practiceDescription: string;
 }
 
