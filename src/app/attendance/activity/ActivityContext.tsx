@@ -1,21 +1,12 @@
 "use client";
 
 import { createContext, useContext, useReducer, type ReactNode } from "react";
-
-// Define all activity types
-export type Activity =
-	| "30-minutes-session"
-	| "endurance-run"
-	| "normal-long-session";
-export type ThirtyMinutesSessionActivity =
-	| "personal-technique"
-	| "probability-practice"
-	| "buddy-training";
-export type ProbabilityActivity = "layup" | "straight-shot" | "attack-board";
-export type NormalSessionActivity =
-	| "train-newbies"
-	| "train-with-coach"
-	| "others";
+import type {
+	Activity,
+	ThirtyMinutesSessionActivity,
+	ProbabilityActivity,
+	NormalSessionActivity,
+} from "./types";
 
 export interface ActivityState {
 	// Main activity
