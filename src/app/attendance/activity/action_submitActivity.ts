@@ -2,11 +2,9 @@
 
 import type { ActivityState } from "./ActivityContext";
 import { isActivityComplete } from "./activityValidation";
-import { MongoClient } from "mongodb";
 import type { BaseCompletedActivity, CompletedActivity } from "./types";
 import { nanoid } from "nanoid";
-
-const mongoUrl = process.env.MONGO_URL ?? "mongodb://localhost:27017";
+import getDB from "src/server/db";
 
 function createCompletedActivity(
 	state: CompletedActivity,
@@ -72,14 +70,9 @@ export default async function action_submitActivity(
 	"use server";
 	if (!isActivityComplete(state)) return;
 
-	const client = await MongoClient.connect(mongoUrl);
-	const db = client.db("attendances");
+	await using db = await getDB();
 
 	const completedActivity = createCompletedActivity(state, attendanceId);
 
-	try {
-		await db.collection("activities").insertOne(completedActivity);
-	} finally {
-		await client.close();
-	}
+	await db.collection("activities").insertOne(completedActivity);
 }
