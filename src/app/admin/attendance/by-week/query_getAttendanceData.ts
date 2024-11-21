@@ -16,7 +16,8 @@ export type AttendanceData = {
 export default async function query_getAttendanceData(
 	weekRange: WeekRange,
 ): Promise<AttendanceData[]> {
-	await using db = await getDB();
+	const { db, close } = await getDB();
+
 	const activitiesCollection = db.collection<ActivitiesCollection>(
 		ActivitiesCollectionName,
 	);
@@ -49,6 +50,8 @@ export default async function query_getAttendanceData(
 			};
 		},
 	);
+
+	await close();
 
 	return attendanceData;
 }

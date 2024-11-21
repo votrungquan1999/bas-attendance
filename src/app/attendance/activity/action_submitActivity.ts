@@ -70,9 +70,11 @@ export default async function action_submitActivity(
 	"use server";
 	if (!isActivityComplete(state)) return;
 
-	await using db = await getDB();
+	const { db, close } = await getDB();
 
 	const completedActivity = createCompletedActivity(state, attendanceId);
 
 	await db.collection("activities").insertOne(completedActivity);
+
+	await close();
 }
