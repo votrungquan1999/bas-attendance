@@ -1,5 +1,10 @@
 import { connection } from "next/server";
 
+export type WeekRange = {
+	start: Date;
+	end: Date;
+};
+
 /**
  * Calculates the start and end dates of a week based on a week offset
  * @param weekOffset - Number of weeks to offset from current week (negative for past weeks)
