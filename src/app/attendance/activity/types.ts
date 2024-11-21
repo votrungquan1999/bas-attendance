@@ -2,6 +2,7 @@ import type { ProbabilityActivity } from "./ActivityContext";
 
 // Base type for all completed activities
 export interface BaseCompletedActivity {
+	id: string;
 	attendanceId: string;
 	submittedAt: number;
 }

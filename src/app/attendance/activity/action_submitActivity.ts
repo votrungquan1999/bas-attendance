@@ -4,6 +4,7 @@ import type { ActivityState } from "./ActivityContext";
 import { isActivityComplete } from "./activityValidation";
 import { MongoClient } from "mongodb";
 import type { BaseCompletedActivity, CompletedActivity } from "./types";
+import { nanoid } from "nanoid";
 
 const mongoUrl = process.env.MONGO_URL ?? "mongodb://localhost:27017";
 
@@ -12,6 +13,7 @@ function createCompletedActivity(
 	attendanceId: string,
 ): CompletedActivity {
 	const baseActivity: BaseCompletedActivity = {
+		id: nanoid(),
 		attendanceId,
 		submittedAt: Date.now(),
 	};
