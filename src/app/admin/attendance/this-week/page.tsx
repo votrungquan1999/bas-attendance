@@ -15,6 +15,7 @@ const mockAttendanceData: {
 		athleteName: "John Doe",
 		activities: [
 			{
+				id: "1",
 				attendanceId: "1",
 				submittedAt: Date.now() - 86400000 * 1,
 				activity: "30-minutes-session",
@@ -24,6 +25,7 @@ const mockAttendanceData: {
 				practiceDescription: "Made 25 consecutive backboard finishes",
 			},
 			{
+				id: "2",
 				attendanceId: "2",
 				submittedAt: Date.now() - 86400000 * 2,
 				activity: "endurance-run",
@@ -31,6 +33,7 @@ const mockAttendanceData: {
 				minutes: "30",
 			},
 			{
+				id: "3",
 				attendanceId: "3",
 				submittedAt: Date.now() - 86400000 * 2,
 				activity: "30-minutes-session",
@@ -38,12 +41,14 @@ const mockAttendanceData: {
 				thirtyMinExplanation: "Pick and roll practice with Mike",
 			},
 			{
+				id: "4",
 				attendanceId: "4",
 				submittedAt: Date.now() - 86400000 * 3,
 				activity: "normal-long-session",
 				sessionType: "train-with-coach",
 			},
 			{
+				id: "5",
 				attendanceId: "5",
 				submittedAt: Date.now() - 86400000 * 3,
 				activity: "30-minutes-session",
@@ -53,6 +58,7 @@ const mockAttendanceData: {
 				practiceDescription: "Free throw practice, 45/50 made",
 			},
 			{
+				id: "6",
 				attendanceId: "6",
 				submittedAt: Date.now() - 86400000 * 4,
 				activity: "30-minutes-session",
@@ -60,6 +66,7 @@ const mockAttendanceData: {
 				thirtyMinExplanation: "Crossover and between-legs dribbling",
 			},
 			{
+				id: "7",
 				attendanceId: "7",
 				submittedAt: Date.now() - 86400000 * 4,
 				activity: "normal-long-session",
@@ -67,6 +74,7 @@ const mockAttendanceData: {
 				sessionExplanation: "3v3 tournament practice",
 			},
 			{
+				id: "8",
 				attendanceId: "8",
 				submittedAt: Date.now() - 86400000 * 5,
 				activity: "30-minutes-session",
@@ -76,6 +84,7 @@ const mockAttendanceData: {
 				practiceDescription: "Reverse layup practice, 18/20 success",
 			},
 			{
+				id: "9",
 				attendanceId: "9",
 				submittedAt: Date.now() - 86400000 * 5,
 				activity: "endurance-run",
@@ -83,6 +92,7 @@ const mockAttendanceData: {
 				minutes: "35",
 			},
 			{
+				id: "10",
 				attendanceId: "10",
 				submittedAt: Date.now() - 86400000 * 6,
 				activity: "normal-long-session",
@@ -94,6 +104,7 @@ const mockAttendanceData: {
 		athleteName: "Sarah Williams",
 		activities: [
 			{
+				id: "11",
 				attendanceId: "11",
 				submittedAt: Date.now() - 86400000 * 1,
 				activity: "30-minutes-session",
@@ -103,12 +114,14 @@ const mockAttendanceData: {
 				practiceDescription: "Euro-step layup drills, 19/20 success rate",
 			},
 			{
+				id: "12",
 				attendanceId: "12",
 				submittedAt: Date.now() - 86400000 * 1,
 				activity: "normal-long-session",
 				sessionType: "train-with-coach",
 			},
 			{
+				id: "13",
 				attendanceId: "13",
 				submittedAt: Date.now() - 86400000 * 2,
 				activity: "30-minutes-session",
@@ -116,6 +129,7 @@ const mockAttendanceData: {
 				thirtyMinExplanation: "Advanced ball handling sequences",
 			},
 			{
+				id: "14",
 				attendanceId: "14",
 				submittedAt: Date.now() - 86400000 * 3,
 				activity: "normal-long-session",
@@ -123,6 +137,7 @@ const mockAttendanceData: {
 				sessionExplanation: "Full court 5v5 scrimmage",
 			},
 			{
+				id: "15",
 				attendanceId: "15",
 				submittedAt: Date.now() - 86400000 * 3,
 				activity: "30-minutes-session",
@@ -132,6 +147,7 @@ const mockAttendanceData: {
 				practiceDescription: "Three-point shooting practice, 40/50 made",
 			},
 			{
+				id: "16",
 				attendanceId: "16",
 				submittedAt: Date.now() - 86400000 * 4,
 				activity: "endurance-run",
@@ -139,6 +155,7 @@ const mockAttendanceData: {
 				minutes: "40",
 			},
 			{
+				id: "17",
 				attendanceId: "17",
 				submittedAt: Date.now() - 86400000 * 4,
 				activity: "30-minutes-session",
@@ -146,6 +163,7 @@ const mockAttendanceData: {
 				thirtyMinExplanation: "Defense rotation drills with team",
 			},
 			{
+				id: "18",
 				attendanceId: "18",
 				submittedAt: Date.now() - 86400000 * 5,
 				activity: "30-minutes-session",
@@ -155,12 +173,14 @@ const mockAttendanceData: {
 				practiceDescription: "Offensive rebound and putback practice",
 			},
 			{
+				id: "19",
 				attendanceId: "19",
 				submittedAt: Date.now() - 86400000 * 5,
 				activity: "normal-long-session",
 				sessionType: "train-newbies",
 			},
 			{
+				id: "20",
 				attendanceId: "20",
 				submittedAt: Date.now() - 86400000 * 6,
 				activity: "30-minutes-session",
@@ -173,6 +193,7 @@ const mockAttendanceData: {
 		athleteName: "Mike Johnson",
 		activities: [
 			{
+				id: "21",
 				attendanceId: "21",
 				submittedAt: Date.now() - 86400000 * 1,
 				activity: "30-minutes-session",
@@ -180,6 +201,7 @@ const mockAttendanceData: {
 				thirtyMinExplanation: "Defensive slides and positioning",
 			},
 			{
+				id: "22",
 				attendanceId: "22",
 				submittedAt: Date.now() - 86400000 * 1,
 				activity: "normal-long-session",
@@ -187,6 +209,7 @@ const mockAttendanceData: {
 				sessionExplanation: "Team defensive drills and scrimmage",
 			},
 			{
+				id: "23",
 				attendanceId: "23",
 				submittedAt: Date.now() - 86400000 * 2,
 				activity: "30-minutes-session",
@@ -196,6 +219,7 @@ const mockAttendanceData: {
 				practiceDescription: "Mid-range jump shots, 35/40 made",
 			},
 			{
+				id: "24",
 				attendanceId: "24",
 				submittedAt: Date.now() - 86400000 * 2,
 				activity: "endurance-run",
@@ -203,6 +227,7 @@ const mockAttendanceData: {
 				minutes: "35",
 			},
 			{
+				id: "25",
 				attendanceId: "25",
 				submittedAt: Date.now() - 86400000 * 3,
 				activity: "30-minutes-session",
@@ -210,12 +235,14 @@ const mockAttendanceData: {
 				thirtyMinExplanation: "Screen and roll defense practice",
 			},
 			{
+				id: "26",
 				attendanceId: "26",
 				submittedAt: Date.now() - 86400000 * 4,
 				activity: "normal-long-session",
 				sessionType: "train-with-coach",
 			},
 			{
+				id: "27",
 				attendanceId: "27",
 				submittedAt: Date.now() - 86400000 * 4,
 				activity: "30-minutes-session",
@@ -225,6 +252,7 @@ const mockAttendanceData: {
 				practiceDescription: "Offensive rebound positioning drills",
 			},
 			{
+				id: "28",
 				attendanceId: "28",
 				submittedAt: Date.now() - 86400000 * 5,
 				activity: "30-minutes-session",
@@ -232,6 +260,7 @@ const mockAttendanceData: {
 				thirtyMinExplanation: "Ball screen navigation drills",
 			},
 			{
+				id: "29",
 				attendanceId: "29",
 				submittedAt: Date.now() - 86400000 * 5,
 				activity: "normal-long-session",
@@ -239,6 +268,7 @@ const mockAttendanceData: {
 				sessionExplanation: "Practice game with visiting team",
 			},
 			{
+				id: "30",
 				attendanceId: "30",
 				submittedAt: Date.now() - 86400000 * 6,
 				activity: "30-minutes-session",
@@ -283,10 +313,11 @@ export default async function ThisWeekPage() {
 	// Filter activities for the selected week
 	const filteredData = mockAttendanceData.map((athlete) => ({
 		...athlete,
-		activities: athlete.activities.filter((activity) => {
-			const activityDate = new Date(activity.submittedAt);
-			return activityDate >= weekRange.start && activityDate <= weekRange.end;
-		}),
+		activities: athlete.activities,
+		// activities: athlete.activities.filter((activity) => {
+		// 	const activityDate = new Date(activity.submittedAt);
+		// 	return activityDate >= weekRange.start && activityDate <= weekRange.end;
+		// }),
 	}));
 
 	return (

@@ -14,7 +14,7 @@ export default function getActivityDescription(
 				};
 				const practiceTypeMap = {
 					layup: "Layup Practice",
-					"straight-shot": "Jump Shot",
+					"straight-shot": "Straight Shot",
 					"attack-board": "Backboard Finish",
 				};
 				return `${practiceTypeMap[activity.practiceType]} (Level ${activity.practiceLevel} - ${levelMap[activity.practiceLevel]}) - ${activity.practiceDescription}`;
