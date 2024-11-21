@@ -5,8 +5,7 @@ import {
 	PopoverTrigger,
 } from "src/shadcn/components/ui/popover";
 import GoalIndicator from "./GoalIndicator";
-import formatDate from "../../../../helpers/formatDate";
-import getActivityDescription from "../../../../helpers/activities/getActivityDescription";
+import ActivitySection from "./ActivitySection";
 
 interface GroupedNormalSessions {
 	trainNewbies: CompletedActivity[];
@@ -38,18 +37,7 @@ function Progress({ groupedActivities, goals }: NormalSessionProgressProps) {
 					type="button"
 					className="flex items-center gap-1 text-sm hover:bg-gray-50 p-1 rounded"
 				>
-					<div className="font-medium">
-						{totalCompleted}/{totalGoals}
-					</div>
-					<div
-						className={
-							totalCompleted === totalGoals
-								? "text-green-500"
-								: "text-yellow-500"
-						}
-					>
-						({totalCompleted === totalGoals ? "Complete" : "In Progress"})
-					</div>
+					<GoalIndicator current={totalCompleted} goal={totalGoals} />
 				</button>
 			</PopoverTrigger>
 			<PopoverContent className="w-80">
@@ -78,6 +66,11 @@ export default function NormalLongSessionsProgress({
 	groupedActivities,
 	goals,
 }: NormalSessionProgressProps) {
+	const standardSessions = [
+		...groupedActivities.trainNewbies,
+		...groupedActivities.trainWithCoach,
+	].sort((a, b) => b.submittedAt - a.submittedAt);
+
 	return (
 		<div className="border rounded-lg p-3">
 			<div className="flex justify-between items-center mb-2 pb-2 border-b">
@@ -87,41 +80,16 @@ export default function NormalLongSessionsProgress({
 				<Progress groupedActivities={groupedActivities} goals={goals} />
 			</div>
 			<div className="space-y-3 max-h-[300px] overflow-y-auto">
-				{/* Standard Sessions */}
-				{[
-					...groupedActivities.trainNewbies,
-					...groupedActivities.trainWithCoach,
-				]
-					.sort((a, b) => b.submittedAt - a.submittedAt)
-					.map((activity) => (
-						<div key={activity.attendanceId} className="bg-gray-50 p-2 rounded">
-							<div className="text-sm font-medium text-purple-600 mb-1">
-								{formatDate(activity.submittedAt)}
-							</div>
-							<div className="text-sm">{getActivityDescription(activity)}</div>
-						</div>
-					))}
-
-				{/* Others */}
+				<ActivitySection
+					activities={standardSessions}
+					theme="normal-long-session"
+				/>
 				{groupedActivities.others.length > 0 && (
-					<div className="space-y-2">
-						<h4 className="text-sm font-medium text-purple-500">
-							Other Activities
-						</h4>
-						{groupedActivities.others.map((activity) => (
-							<div
-								key={activity.attendanceId}
-								className="bg-gray-50 p-2 rounded"
-							>
-								<div className="text-sm font-medium text-purple-600 mb-1">
-									{formatDate(activity.submittedAt)}
-								</div>
-								<div className="text-sm">
-									{getActivityDescription(activity)}
-								</div>
-							</div>
-						))}
-					</div>
+					<ActivitySection
+						title="Other Activities"
+						activities={groupedActivities.others}
+						theme="normal-long-session"
+					/>
 				)}
 			</div>
 		</div>

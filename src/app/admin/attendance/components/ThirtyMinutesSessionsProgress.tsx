@@ -5,8 +5,7 @@ import {
 } from "src/shadcn/components/ui/popover";
 import GoalIndicator from "./GoalIndicator";
 import type { CompletedActivity } from "src/app/attendance/activity/types";
-import formatDate from "../../../../helpers/formatDate";
-import getActivityDescription from "src/helpers/activities/getActivityDescription";
+import ActivitySection from "./ActivitySection";
 
 interface GroupedThirtyMinSessions {
 	probabilityPractice: CompletedActivity[];
@@ -100,56 +99,21 @@ export default function ThirtyMinutesSessionsProgress({
 				<Progress groupedActivities={groupedActivities} goals={goals} />
 			</div>
 			<div className="space-y-3 max-h-[300px] overflow-y-auto">
-				{/* Probability Practice */}
-				<div className="space-y-2">
-					<div className="flex justify-between items-center">
-						<h4 className="text-sm font-medium text-blue-500">
-							Probability Practice
-						</h4>
-					</div>
-					{groupedActivities.probabilityPractice.map((activity) => (
-						<div key={activity.attendanceId} className="bg-gray-50 p-2 rounded">
-							<div className="text-sm font-medium text-blue-600 mb-1">
-								{formatDate(activity.submittedAt)}
-							</div>
-							<div className="text-sm">{getActivityDescription(activity)}</div>
-						</div>
-					))}
-				</div>
-
-				{/* Personal Technique */}
-				<div className="space-y-2">
-					<div className="flex justify-between items-center">
-						<h4 className="text-sm font-medium text-blue-500">
-							Personal Technique
-						</h4>
-					</div>
-					{groupedActivities.personalTechnique.map((activity) => (
-						<div key={activity.attendanceId} className="bg-gray-50 p-2 rounded">
-							<div className="text-sm font-medium text-blue-600 mb-1">
-								{formatDate(activity.submittedAt)}
-							</div>
-							<div className="text-sm">{getActivityDescription(activity)}</div>
-						</div>
-					))}
-				</div>
-
-				{/* Buddy Training */}
-				<div className="space-y-2">
-					<div className="flex justify-between items-center">
-						<h4 className="text-sm font-medium text-blue-500">
-							Buddy Training
-						</h4>
-					</div>
-					{groupedActivities.buddyTraining.map((activity) => (
-						<div key={activity.attendanceId} className="bg-gray-50 p-2 rounded">
-							<div className="text-sm font-medium text-blue-600 mb-1">
-								{formatDate(activity.submittedAt)}
-							</div>
-							<div className="text-sm">{getActivityDescription(activity)}</div>
-						</div>
-					))}
-				</div>
+				<ActivitySection
+					title="Probability Practice"
+					activities={groupedActivities.probabilityPractice}
+					theme="30-minutes-session"
+				/>
+				<ActivitySection
+					title="Personal Technique"
+					activities={groupedActivities.personalTechnique}
+					theme="30-minutes-session"
+				/>
+				<ActivitySection
+					title="Buddy Training"
+					activities={groupedActivities.buddyTraining}
+					theme="30-minutes-session"
+				/>
 			</div>
 		</div>
 	);

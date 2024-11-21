@@ -1,7 +1,6 @@
 import type { CompletedActivity } from "src/app/attendance/activity/types";
 import GoalIndicator from "./GoalIndicator";
-import formatDate from "../../../../helpers/formatDate";
-import getActivityDescription from "../../../../helpers/activities/getActivityDescription";
+import ActivitySection from "./ActivitySection";
 
 interface EnduranceRunsProgressProps {
 	activities: CompletedActivity[];
@@ -19,14 +18,7 @@ export default function EnduranceRunsProgress({
 				<GoalIndicator current={activities.length} goal={goal} />
 			</div>
 			<div className="space-y-2 max-h-[300px] overflow-y-auto">
-				{activities.map((activity) => (
-					<div key={activity.attendanceId} className="bg-gray-50 p-2 rounded">
-						<div className="text-sm font-medium text-green-600 mb-1">
-							{formatDate(activity.submittedAt)}
-						</div>
-						<div className="text-sm">{getActivityDescription(activity)}</div>
-					</div>
-				))}
+				<ActivitySection activities={activities} theme="endurance-run" />
 			</div>
 		</div>
 	);
