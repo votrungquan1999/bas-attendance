@@ -6,7 +6,9 @@ import {
 } from "src/shadcn/components/ui/dialog";
 import { action_saveAuthCode } from "./actions/auth";
 
-export default function AuthModal({ invalidCode }: { invalidCode: boolean }) {
+export default function CodeAuthModal({
+	invalidCode,
+}: { invalidCode: boolean }) {
 	return (
 		<Dialog open={true} modal={true}>
 			<DialogContent className="sm:max-w-[425px]">

@@ -14,7 +14,7 @@ import type {
 	ThirtyMinutesSessionActivity,
 	ProbabilityActivity,
 	NormalSessionActivity,
-} from "./ActivityContext";
+} from "./types";
 import { useActivity } from "./ActivityContext";
 import { cn } from "src/shadcn/lib/utils";
 import { isActivityComplete } from "./activityValidation";
