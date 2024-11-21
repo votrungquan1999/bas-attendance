@@ -5,6 +5,7 @@ import ThirtyMinutesSessionsProgress from "../components/ThirtyMinutesSessionsPr
 import EnduranceRunsProgress from "../components/EnduranceRunsProgress";
 import NormalLongSessionsProgress from "../components/NormalLongSessionsProgress";
 import groupActivities from "src/helpers/activities/groupActivities";
+import { redirect } from "next/navigation";
 
 // Mock data for demonstration
 const mockAttendanceData: {
@@ -307,8 +308,19 @@ const WEEKLY_GOALS: WeeklyGoals = {
 	},
 };
 
-export default async function ThisWeekPage() {
-	const weekRange = await getWeekRange(0);
+export default async function ThisWeekPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ weekOffset: string | undefined }>;
+}) {
+	const paramsWeekOffset = (await searchParams).weekOffset;
+	const weekOffset = paramsWeekOffset ? Number.parseInt(paramsWeekOffset) : 0;
+
+	if (weekOffset > 0) {
+		redirect("/admin/attendance/by-week");
+	}
+
+	const weekRange = await getWeekRange(weekOffset);
 
 	// Filter activities for the selected week
 	const filteredData = mockAttendanceData.map((athlete) => ({
@@ -324,10 +336,14 @@ export default async function ThisWeekPage() {
 		<div className="p-6">
 			<div className="flex justify-between items-center mb-4">
 				<h1 className="text-2xl font-bold">Attendance</h1>
-				<WeekRangeNav weekRange={weekRange} />
+				<WeekRangeNav
+					weekRange={weekRange}
+					disableNextWeek={weekOffset === 0}
+				/>
 			</div>
+
 			<div className="space-y-6">
-				{filteredData.map((athlete) => {
+				{filteredData.map(async (athlete) => {
 					const groupedActivities = groupActivities(athlete.activities);
 
 					return (
