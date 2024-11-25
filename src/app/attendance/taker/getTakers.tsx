@@ -28,5 +28,6 @@ export async function getTakers() {
 		value: "Test User",
 	};
 
-	return [...takers, testUser];
+	// skip Tự
+	return [...takers.slice(0, 10), testUser];
 }

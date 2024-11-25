@@ -7,6 +7,8 @@ import NormalLongSessionsProgress from "../components/NormalLongSessionsProgress
 import groupActivities from "src/helpers/activities/groupActivities";
 import { redirect } from "next/navigation";
 import query_getAttendanceData from "./query_getAttendanceData";
+import type { Taker } from "src/app/attendance/taker/getTakers";
+import query_getEligibleAthletes from "./query_getEligibleAthletes";
 
 // Mock data for demonstration, keep it here for now
 // const mockAttendanceData: {
@@ -309,6 +311,93 @@ const WEEKLY_GOALS: WeeklyGoals = {
 	},
 };
 
+interface RemainingGoals {
+	thirtyMin?: {
+		personalTechnique?: number;
+		probabilityPractice?: number;
+		buddyTraining?: number;
+	};
+	enduranceRun?: number;
+	normalSession?: {
+		trainWithCoach?: number;
+		trainNewbies?: number;
+	};
+}
+
+function calculateRemainingGoals(
+	groupedActivities: ReturnType<typeof groupActivities>,
+): RemainingGoals {
+	const remaining: RemainingGoals = {};
+
+	// Check thirty minutes sessions
+	const thirtyMin: RemainingGoals["thirtyMin"] = {};
+	if (
+		(groupedActivities.thirtyMinSessions.personalTechnique?.length || 0) <
+		WEEKLY_GOALS.thirtyMin.personalTechnique
+	) {
+		thirtyMin.personalTechnique =
+			WEEKLY_GOALS.thirtyMin.personalTechnique -
+			(groupedActivities.thirtyMinSessions.personalTechnique?.length || 0);
+	}
+	if (
+		(groupedActivities.thirtyMinSessions.probabilityPractice?.length || 0) <
+		WEEKLY_GOALS.thirtyMin.probabilityPractice
+	) {
+		thirtyMin.probabilityPractice =
+			WEEKLY_GOALS.thirtyMin.probabilityPractice -
+			(groupedActivities.thirtyMinSessions.probabilityPractice?.length || 0);
+	}
+	if (
+		(groupedActivities.thirtyMinSessions.buddyTraining?.length || 0) <
+		WEEKLY_GOALS.thirtyMin.buddyTraining
+	) {
+		thirtyMin.buddyTraining =
+			WEEKLY_GOALS.thirtyMin.buddyTraining -
+			(groupedActivities.thirtyMinSessions.buddyTraining?.length || 0);
+	}
+	if (Object.keys(thirtyMin).length > 0) {
+		remaining.thirtyMin = thirtyMin;
+	}
+
+	// Check endurance runs
+	if (groupedActivities.enduranceRuns.length < WEEKLY_GOALS.enduranceRun) {
+		remaining.enduranceRun =
+			WEEKLY_GOALS.enduranceRun - groupedActivities.enduranceRuns.length;
+	}
+
+	// Check normal sessions
+	const normalSession: RemainingGoals["normalSession"] = {};
+	if (
+		(groupedActivities.normalSessions.trainWithCoach?.length || 0) <
+		WEEKLY_GOALS.normalSession.trainWithCoach
+	) {
+		normalSession.trainWithCoach =
+			WEEKLY_GOALS.normalSession.trainWithCoach -
+			(groupedActivities.normalSessions.trainWithCoach?.length || 0);
+	}
+	if (
+		(groupedActivities.normalSessions.trainNewbies?.length || 0) <
+		WEEKLY_GOALS.normalSession.trainNewbies
+	) {
+		normalSession.trainNewbies =
+			WEEKLY_GOALS.normalSession.trainNewbies -
+			(groupedActivities.normalSessions.trainNewbies?.length || 0);
+	}
+	if (Object.keys(normalSession).length > 0) {
+		remaining.normalSession = normalSession;
+	}
+
+	return remaining;
+}
+
+function has30MinGoals(remainingGoals: RemainingGoals): boolean {
+	return !!remainingGoals.thirtyMin;
+}
+
+function hasOtherGoals(remainingGoals: RemainingGoals): boolean {
+	return !!remainingGoals.enduranceRun || !!remainingGoals.normalSession;
+}
+
 export default async function ThisWeekPage({
 	searchParams,
 }: {
@@ -322,8 +411,13 @@ export default async function ThisWeekPage({
 	}
 
 	const weekRange = await getWeekRange(weekOffset);
-
 	const attendanceData = await query_getAttendanceData(weekRange);
+	const eligibleAthletes = await query_getEligibleAthletes();
+
+	// Create a map of athletes who have recorded activities
+	const recordedAthletesMap = new Map(
+		attendanceData.map((athlete) => [athlete.athleteName, athlete]),
+	);
 
 	return (
 		<div className="p-6">
@@ -335,7 +429,8 @@ export default async function ThisWeekPage({
 				/>
 			</div>
 
-			<div className="space-y-6">
+			{/* Progress Section */}
+			<div className="space-y-6 mb-8">
 				{attendanceData.map(async (athlete) => {
 					const groupedActivities = groupActivities(athlete.activities);
 
@@ -367,6 +462,100 @@ export default async function ThisWeekPage({
 						</div>
 					);
 				})}
+			</div>
+
+			{/* Incomplete Goals Section */}
+			<div className="border rounded-lg p-4 bg-orange-50">
+				<h2 className="text-xl font-semibold mb-3">Incomplete Weekly Goals</h2>
+
+				{/* 30 Minutes Sessions Section */}
+				<div className="mb-6">
+					<h3 className="text-lg font-medium mb-2 text-orange-700">
+						Missing 30-Minutes Sessions
+					</h3>
+					<div className="space-y-3">
+						{eligibleAthletes.map((athlete: Taker) => {
+							const recordedData = recordedAthletesMap.get(athlete.value);
+							const groupedActivities = recordedData
+								? groupActivities(recordedData.activities)
+								: groupActivities([]);
+							const remainingGoals = calculateRemainingGoals(groupedActivities);
+
+							if (!has30MinGoals(remainingGoals)) return null;
+
+							return (
+								<div
+									key={`30min-${athlete.id}`}
+									className="border-b pb-2 last:border-b-0"
+								>
+									<h4 className="font-medium">{athlete.value}</h4>
+									<div className="ml-4 text-sm text-gray-600 border-l-2 pl-2 my-1 border-orange-400">
+										{remainingGoals.thirtyMin?.personalTechnique && (
+											<div>
+												Personal Technique:{" "}
+												{remainingGoals.thirtyMin.personalTechnique} more
+											</div>
+										)}
+										{remainingGoals.thirtyMin?.probabilityPractice && (
+											<div>
+												Probability Practice:{" "}
+												{remainingGoals.thirtyMin.probabilityPractice} more
+											</div>
+										)}
+										{remainingGoals.thirtyMin?.buddyTraining && (
+											<div>
+												Buddy Training: {remainingGoals.thirtyMin.buddyTraining}{" "}
+												more
+											</div>
+										)}
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				</div>
+
+				{/* Other Goals Section */}
+				<div>
+					<h3 className="text-lg font-medium mb-2">Missing Other Goals</h3>
+					<div className="space-y-3">
+						{eligibleAthletes.map((athlete: Taker) => {
+							const recordedData = recordedAthletesMap.get(athlete.value);
+							const groupedActivities = recordedData
+								? groupActivities(recordedData.activities)
+								: groupActivities([]);
+							const remainingGoals = calculateRemainingGoals(groupedActivities);
+
+							if (!hasOtherGoals(remainingGoals)) return null;
+
+							return (
+								<div
+									key={`other-${athlete.id}`}
+									className="border-b pb-2 last:border-b-0"
+								>
+									<h4 className="font-medium">{athlete.value}</h4>
+									<ul className="ml-4 text-sm text-gray-600">
+										{remainingGoals.enduranceRun && (
+											<li>
+												Endurance Runs: {remainingGoals.enduranceRun} more
+												needed
+											</li>
+										)}
+										{remainingGoals.normalSession && (
+											<li>
+												Normal Sessions:
+												{remainingGoals.normalSession.trainWithCoach &&
+													` Train with Coach (${remainingGoals.normalSession.trainWithCoach} more)`}
+												{remainingGoals.normalSession.trainNewbies &&
+													` Train Newbies (${remainingGoals.normalSession.trainNewbies} more)`}
+											</li>
+										)}
+									</ul>
+								</div>
+							);
+						})}
+					</div>
+				</div>
 			</div>
 		</div>
 	);
