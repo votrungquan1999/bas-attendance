@@ -64,8 +64,13 @@ export default function WeekRangeNav({
 					pending && "animate-pulse",
 				)}
 			>
-				{weekRange.start.toLocaleDateString("vi-VN")} -{" "}
-				{weekRange.end.toLocaleDateString("vi-VN")}
+				{weekRange.start.toLocaleDateString("vi-VN", {
+					timeZone: "Asia/Saigon",
+				})}{" "}
+				-{" "}
+				{weekRange.end.toLocaleDateString("vi-VN", {
+					timeZone: "Asia/Saigon",
+				})}
 				<Loader2
 					className={cn("h-4 w-4 ml-1 animate-spin", !pending && "invisible")}
 				/>

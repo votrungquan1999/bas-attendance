@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { DateTime } from "luxon";
 
 export type WeekRange = {
 	start: Date;
@@ -20,28 +21,19 @@ export type WeekRange = {
 export default async function getWeekRange(weekOffset = 0) {
 	await connection();
 
-	// Create date in Asia/Saigon timezone
-	const today = new Date(
-		new Date().toLocaleString("en-US", { timeZone: "Asia/Saigon" }),
-	);
+	const timeZone = "Asia/Saigon";
 
-	// Calculate start of week (Monday)
-	const startOfWeek = new Date(today);
-	const currentDay = today.getDay();
-	// Convert Sunday (0) to 7 for easier calculation
-	const daysFromMonday = currentDay === 0 ? 7 : currentDay;
-	// Subtract days to get to Monday, then add offset weeks
-	startOfWeek.setDate(today.getDate() - (daysFromMonday - 1) + weekOffset * 7);
-	startOfWeek.setHours(0, 0, 0, 0);
+	// Get current date in Saigon timezone
+	const now = DateTime.now().setZone(timeZone);
 
-	// Calculate end of week (Sunday)
-	const endOfWeek = new Date(startOfWeek);
-	// Add 6 days to Monday to get to Sunday
-	endOfWeek.setDate(startOfWeek.getDate() + 6);
-	endOfWeek.setHours(23, 59, 59, 999);
+	// Get start of week (Monday) in Saigon timezone
+	const startOfWeek = now.startOf("week").plus({ weeks: weekOffset });
+
+	// Get end of week (Sunday) in Saigon timezone
+	const endOfWeek = startOfWeek.endOf("week");
 
 	return {
-		start: startOfWeek,
-		end: endOfWeek,
+		start: startOfWeek.toJSDate(),
+		end: endOfWeek.toJSDate(),
 	};
 }
