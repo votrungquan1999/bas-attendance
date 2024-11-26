@@ -5,6 +5,9 @@ export default async function query_getEligibleAthletes() {
 
 	const eligibleAthletes = allAthletes.filter(
 		(athlete) => athlete.id !== "test_user",
+		// use this when need to show test user
+		// () => true,
 	);
+
 	return eligibleAthletes;
 }

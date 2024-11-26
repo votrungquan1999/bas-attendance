@@ -1,13 +1,12 @@
 import { groupBy } from "lodash/fp";
 import type { CompletedActivity } from "src/app/attendance/activity/types";
-import { getTakers } from "src/app/attendance/taker/getTakers";
 import type { WeekRange } from "src/helpers/weekRange";
 import {
 	type ActivitiesCollection,
 	ActivitiesCollectionName,
 } from "src/server/collections";
 import getDB from "src/server/db";
-
+import query_getEligibleAthletes from "./query_getEligibleAthletes";
 export type AttendanceData = {
 	athleteName: string;
 	activities: CompletedActivity[];
@@ -33,14 +32,14 @@ export default async function query_getAttendanceData(
 
 	const groupedByAttendanceId = groupBy("attendanceId", activities);
 
-	const takers = await getTakers();
+	const takers = await query_getEligibleAthletes();
 
 	const attendanceData = Object.entries(groupedByAttendanceId).flatMap(
 		([attendanceId, activities]) => {
 			const taker = takers.find((taker) => taker.id === attendanceId);
 
 			// skip test user and not assigned taker
-			if (!taker || taker.id === "test_user") {
+			if (!taker) {
 				return [];
 			}
 
