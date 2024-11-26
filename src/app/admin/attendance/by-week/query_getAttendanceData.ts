@@ -24,7 +24,7 @@ export default async function query_getAttendanceData(
 
 	const activities = await activitiesCollection
 		.find({
-			submittedAt: {
+			activityTimestamp: {
 				$gte: weekRange.start.getTime(),
 				$lte: weekRange.end.getTime(),
 			},
