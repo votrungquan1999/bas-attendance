@@ -1,14 +1,23 @@
 "use client";
 
-import { createContext, useContext, useReducer, type ReactNode } from "react";
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useReducer,
+	type ReactNode,
+} from "react";
 import type {
 	Activity,
 	ThirtyMinutesSessionActivity,
 	ProbabilityActivity,
 	NormalSessionActivity,
 } from "./types";
+import { DateTime } from "luxon";
 
 export interface ActivityState {
+	activityTimestamp: number;
+
 	// Main activity
 	activity?: Activity;
 
@@ -31,6 +40,7 @@ export interface ActivityState {
 }
 
 type ActionType =
+	| { type: "SET_ATTENDANCE_TIMESTAMP"; payload: number }
 	| { type: "SET_ACTIVITY"; payload?: Activity }
 	| { type: "SET_THIRTY_MIN_ACTIVITY"; payload?: ThirtyMinutesSessionActivity }
 	| { type: "SET_THIRTY_MIN_EXPLANATION"; payload: string }
@@ -44,6 +54,7 @@ type ActionType =
 	| { type: "RESET_ALL" };
 
 const initialState: ActivityState = {
+	activityTimestamp: 0,
 	activity: undefined,
 	thirtyMinActivity: undefined,
 	thirtyMinExplanation: undefined,
@@ -61,6 +72,11 @@ function activityReducer(
 	action: ActionType,
 ): ActivityState {
 	switch (action.type) {
+		case "SET_ATTENDANCE_TIMESTAMP":
+			return {
+				...state,
+				activityTimestamp: action.payload,
+			};
 		case "SET_ACTIVITY":
 			if (action.payload === state.activity) {
 				return state;
@@ -120,7 +136,10 @@ function activityReducer(
 				sessionExplanation: action.payload,
 			};
 		case "RESET_ALL":
-			return initialState;
+			return {
+				...initialState,
+				activityTimestamp: state.activityTimestamp,
+			};
 		default:
 			return state;
 	}
@@ -130,13 +149,21 @@ interface ActivityContextType {
 	state: ActivityState;
 	dispatch: React.Dispatch<ActionType>;
 }
-
 const ActivityContext = createContext<ActivityContextType | undefined>(
 	undefined,
 );
 
 export function ActivityProvider({ children }: { children: ReactNode }) {
 	const [state, dispatch] = useReducer(activityReducer, initialState);
+
+	useEffect(() => {
+		const now = DateTime.now().setZone("Asia/Saigon").startOf("day").toMillis();
+
+		dispatch({
+			type: "SET_ATTENDANCE_TIMESTAMP",
+			payload: now,
+		});
+	}, []);
 
 	return (
 		<ActivityContext.Provider value={{ state, dispatch }}>
