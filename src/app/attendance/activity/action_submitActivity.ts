@@ -14,6 +14,7 @@ function createCompletedActivity(
 		id: nanoid(),
 		attendanceId,
 		submittedAt: Date.now(),
+		activityTimestamp: state.activityTimestamp,
 	};
 
 	switch (state.activity) {

@@ -18,7 +18,11 @@ export type PracticeLevel = "1" | "2" | "3" | "4";
 export interface BaseCompletedActivity {
 	id: string;
 	attendanceId: string;
+
 	submittedAt: number;
+
+	// this timestamp is the start of the day of the activity, in the timezone of Asia/Saigon
+	activityTimestamp: number;
 }
 
 // Type for completed 30-min probability practice

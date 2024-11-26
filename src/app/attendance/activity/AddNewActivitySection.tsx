@@ -21,64 +21,125 @@ import { isActivityComplete } from "./activityValidation";
 import { useState, useTransition, useEffect } from "react";
 import action_submitActivity from "./action_submitActivity";
 import { Check, Loader2 } from "lucide-react";
+import { DateTime } from "luxon";
+
+interface AddNewActivitySectionProps {
+	attendanceId: string;
+}
+
+function getDateOptions() {
+	const options = [];
+	const today = DateTime.now().setZone("Asia/Saigon").startOf("day");
+
+	for (let i = 0; i < 8; i++) {
+		const date = today.minus({ days: i });
+
+		const value = date.toMillis();
+		const label = date.toLocaleString({
+			weekday: "long",
+			month: "long",
+			day: "numeric",
+		});
+
+		options.push({ value, label });
+	}
+
+	return options;
+}
 
 export default function AddNewActivitySection({
 	attendanceId,
-}: {
-	attendanceId: string;
-}) {
+}: AddNewActivitySectionProps) {
 	const { state, dispatch } = useActivity();
+	const dateOptions = getDateOptions();
 
 	return (
 		<div className="max-w-2xl mx-auto p-6 space-y-8">
 			<div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
-				<div className="space-y-2">
-					<label
-						htmlFor="main-activity"
-						className="text-lg font-semibold text-gray-900"
-					>
-						What activity did you do today?
-					</label>
-					<Select
-						value={state.activity ?? ""}
-						onValueChange={(value) =>
-							dispatch({ type: "SET_ACTIVITY", payload: value as Activity })
-						}
-					>
-						<SelectTrigger id="main-activity" className="w-full">
-							<SelectValue
-								placeholder={
-									<span className="text-slate-500">Select an activity</span>
-								}
-							/>
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								<SelectLabel>Activities</SelectLabel>
-								<SelectItem value="30-minutes-session">
-									30 minutes session
-								</SelectItem>
-								<SelectItem value="endurance-run">Endurance run</SelectItem>
-								<SelectItem value="normal-long-session">
-									Normal long session
-								</SelectItem>
-							</SelectGroup>
-						</SelectContent>
-					</Select>
-				</div>
+				<div className="space-y-4">
+					<div className="space-y-2">
+						<label
+							htmlFor="attendance-date"
+							className="text-lg font-semibold text-gray-900"
+						>
+							When did you do this activity?
+						</label>
+						<Select
+							value={state.activityTimestamp.toString()}
+							onValueChange={(value) =>
+								dispatch({
+									type: "SET_ATTENDANCE_TIMESTAMP",
+									payload: Number.parseInt(value),
+								})
+							}
+						>
+							<SelectTrigger id="attendance-date" className="w-full">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectLabel>Date</SelectLabel>
+									{dateOptions.map((option) => (
+										<SelectItem
+											key={option.value}
+											value={option.value.toString()}
+										>
+											{option.label}
+										</SelectItem>
+									))}
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+					</div>
 
-				<div className="mt-6">
-					{state.activity && (
-						<div className="border-t pt-6">
-							{state.activity === "30-minutes-session" && (
-								<ThirtyMinutesSession />
-							)}
-							{state.activity === "endurance-run" && <EnduranceRun />}
-							{state.activity === "normal-long-session" && (
-								<NormalLongSession />
-							)}
-						</div>
-					)}
+					<div className="space-y-2">
+						<label
+							htmlFor="main-activity"
+							className="text-lg font-semibold text-gray-900"
+						>
+							What activity did you do today?
+						</label>
+						<Select
+							value={state.activity ?? ""}
+							onValueChange={(value) =>
+								dispatch({ type: "SET_ACTIVITY", payload: value as Activity })
+							}
+						>
+							<SelectTrigger id="main-activity" className="w-full">
+								<SelectValue
+									placeholder={
+										<span className="text-slate-500">Select an activity</span>
+									}
+								/>
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectLabel>Activities</SelectLabel>
+									<SelectItem value="30-minutes-session">
+										30 minutes session
+									</SelectItem>
+									<SelectItem value="endurance-run">Endurance run</SelectItem>
+									<SelectItem value="normal-long-session">
+										Normal long session
+									</SelectItem>
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+					</div>
+
+					<div className="mt-6">
+						{state.activity && (
+							<div className="border-t pt-6">
+								{state.activity === "30-minutes-session" && (
+									<ThirtyMinutesSession />
+								)}
+								{state.activity === "endurance-run" && <EnduranceRun />}
+								{state.activity === "normal-long-session" && (
+									<NormalLongSession />
+								)}
+							</div>
+						)}
+					</div>
 				</div>
 			</div>
 
@@ -412,7 +473,6 @@ function NormalLongSession() {
 
 function SubmitButton({ attendanceId }: { attendanceId: string }) {
 	const { state, dispatch } = useActivity();
-
 	const [pending, startTransition] = useTransition();
 	const [lastPending, setLastPending] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
