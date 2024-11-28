@@ -10,7 +10,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import toNonAccentVietnamese from "src/helpers/toNonAccentVietnamese";
 import { getTakers } from "./getTakers";
-import { action_handleSelectTaker } from "./action_handleSelectTaker";
+import { action_handleSelectTaker } from "../../../server/actions/action_handleSelectTaker";
 
 export default async function TakerPage() {
 	const cookieStore = await cookies();
