@@ -53,11 +53,11 @@ export default function WeekRangeNav({
 		<div className="flex items-center gap-2">
 			<button
 				type="button"
-				className="flex items-center gap-1 text-sm hover:bg-gray-50 p-1 rounded"
+				className="flex items-center gap-1 text-sm hover:bg-gray-50 p-1 rounded whitespace-nowrap"
 				onClick={onPreviousWeek}
 			>
-				<ChevronLeft className="h-4 w-4 mr-1" />
-				Previous Week
+				<ChevronLeft className="h-4 w-4" />
+				<span className="hidden sm:inline">Previous Week</span>
 			</button>
 			<div
 				className={cn(
@@ -79,14 +79,14 @@ export default function WeekRangeNav({
 			<button
 				type="button"
 				className={cn(
-					"flex items-center gap-1 text-sm hover:bg-gray-50 p-1 rounded",
+					"flex items-center gap-1 text-sm hover:bg-gray-50 p-1 rounded whitespace-nowrap",
 					disableNextWeek && "opacity-50 cursor-not-allowed",
 				)}
 				onClick={onNextWeek}
 				disabled={disableNextWeek}
 			>
-				Next Week
-				<ChevronRight className="h-4 w-4 ml-1" />
+				<span className="hidden sm:inline">Next Week</span>
+				<ChevronRight className="h-4 w-4" />
 			</button>
 		</div>
 	);
