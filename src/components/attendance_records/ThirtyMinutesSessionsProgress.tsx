@@ -91,7 +91,7 @@ export default function ThirtyMinutesSessionsProgress({
 	goals,
 }: ThirtyMinProgressProps) {
 	return (
-		<div className="border rounded-lg p-3">
+		<div className="border rounded-lg p-3 bg-white shadow">
 			<div className="flex justify-between items-center mb-2 pb-2 border-b">
 				<h3 className="text-lg font-medium text-blue-600">
 					30 Minutes Sessions

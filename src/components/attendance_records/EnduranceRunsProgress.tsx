@@ -12,7 +12,7 @@ export default function EnduranceRunsProgress({
 	goal,
 }: EnduranceRunsProgressProps) {
 	return (
-		<div className="border rounded-lg p-3">
+		<div className="border rounded-lg p-3 bg-white shadow">
 			<div className="flex justify-between items-center mb-2 pb-2 border-b">
 				<h3 className="text-lg font-medium text-green-600">Endurance Runs</h3>
 				<GoalIndicator current={activities.length} goal={goal} />
