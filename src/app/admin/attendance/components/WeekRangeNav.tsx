@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { cn } from "src/shadcn/lib/utils";
 
@@ -20,6 +20,7 @@ export default function WeekRangeNav({
 	disableNextWeek = false,
 }: WeekRangeNavProps) {
 	const router = useRouter();
+	const pathname = usePathname();
 	const searchParams = useSearchParams();
 
 	const [pending, startTransition] = useTransition();
@@ -32,7 +33,7 @@ export default function WeekRangeNav({
 		newParams.set("weekOffset", (weekOffset - 1).toString());
 
 		startTransition(() => {
-			router.push(`/admin/attendance/by-week?${newParams.toString()}`);
+			router.push(`${pathname}?${newParams.toString()}`);
 		});
 	}
 
@@ -44,7 +45,7 @@ export default function WeekRangeNav({
 		newParams.set("weekOffset", (weekOffset + 1).toString());
 
 		startTransition(() => {
-			router.push(`/admin/attendance/by-week?${newParams.toString()}`);
+			router.push(`${pathname}?${newParams.toString()}`);
 		});
 	}
 
