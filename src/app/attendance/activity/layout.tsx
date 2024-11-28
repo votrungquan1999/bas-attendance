@@ -2,7 +2,7 @@ import { ActivityProvider } from "./ActivityContext";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { HistoryIcon } from "lucide-react";
-import query_getTakerFromCookies from "./query_getTakerFromCookies";
+import query_getTakerFromCookies from "../../../server/queries/query_getTakerFromCookies";
 import action_resetTaker from "../../../server/actions/action_resetTaker";
 
 export const metadata: Metadata = {
