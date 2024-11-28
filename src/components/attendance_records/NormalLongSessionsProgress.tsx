@@ -72,7 +72,7 @@ export default function NormalLongSessionsProgress({
 	].sort((a, b) => b.submittedAt - a.submittedAt);
 
 	return (
-		<div className="border rounded-lg p-3">
+		<div className="border rounded-lg p-3 bg-white shadow">
 			<div className="flex justify-between items-center mb-2 pb-2 border-b">
 				<h3 className="text-lg font-medium text-purple-600">
 					Normal Long Sessions

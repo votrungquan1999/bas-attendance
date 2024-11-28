@@ -1,9 +1,9 @@
 // import type { CompletedActivity } from "src/app/attendance/activity/types";
-import WeekRangeNav from "src/app/admin/attendance/components/WeekRangeNav";
+import WeekRangeNav from "src/components/attendance_records/WeekRangeNav";
 import getWeekRange from "src/helpers/weekRange";
-import ThirtyMinutesSessionsProgress from "../components/ThirtyMinutesSessionsProgress";
-import EnduranceRunsProgress from "../components/EnduranceRunsProgress";
-import NormalLongSessionsProgress from "../components/NormalLongSessionsProgress";
+import ThirtyMinutesSessionsProgress from "../../../../components/attendance_records/ThirtyMinutesSessionsProgress";
+import EnduranceRunsProgress from "../../../../components/attendance_records/EnduranceRunsProgress";
+import NormalLongSessionsProgress from "../../../../components/attendance_records/NormalLongSessionsProgress";
 import groupActivities from "src/helpers/activities/groupActivities";
 import { redirect } from "next/navigation";
 import query_getAttendanceData from "./query_getAttendanceData";

@@ -2,7 +2,7 @@ import type {
 	CompletedActivity,
 	Activity,
 } from "src/app/attendance/activity/types";
-import formatDate from "../../../../helpers/formatDate";
+import formatDate from "../../helpers/formatDate";
 import getActivityDescription from "src/helpers/activities/getActivityDescription";
 import { cn } from "src/shadcn/lib/utils";
 import { DateTime } from "luxon";

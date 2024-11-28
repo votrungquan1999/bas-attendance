@@ -1,8 +1,11 @@
 "use server";
 
-import type { ActivityState } from "./ActivityContext";
-import { isActivityComplete } from "./activityValidation";
-import type { BaseCompletedActivity, CompletedActivity } from "./types";
+import type { ActivityState } from "../../app/attendance/activity/ActivityContext";
+import { isActivityComplete } from "../../app/attendance/activity/activityValidation";
+import type {
+	BaseCompletedActivity,
+	CompletedActivity,
+} from "../../app/attendance/activity/types";
 import { nanoid } from "nanoid";
 import getDB from "src/server/db";
 
