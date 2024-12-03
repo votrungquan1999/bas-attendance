@@ -1,5 +1,5 @@
 import { groupBy } from "lodash/fp";
-import type { CompletedActivity } from "src/app/attendance/activity/types";
+import type { CompletedActivity } from "src/server/types";
 import type { WeekRange } from "src/helpers/weekRange";
 import {
 	type ActivitiesCollection,

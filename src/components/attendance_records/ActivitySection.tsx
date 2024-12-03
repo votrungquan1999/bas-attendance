@@ -1,7 +1,4 @@
-import type {
-	CompletedActivity,
-	Activity,
-} from "src/app/attendance/activity/types";
+import type { CompletedActivity, Activity } from "src/server/types";
 import ActivityCard from "./ActivityCard";
 import { cn } from "src/shadcn/lib/utils";
 

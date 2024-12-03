@@ -4,30 +4,16 @@ import NormalLongSessionsProgress from "src/components/attendance_records/Normal
 import EnduranceRunsProgress from "src/components/attendance_records/EnduranceRunsProgress";
 import getWeekRange, { type WeekRange } from "src/helpers/weekRange";
 import groupActivities from "src/helpers/activities/groupActivities";
-import query_getTakerFromCookies from "../../../server/queries/query_getTakerFromCookies";
-import action_resetTaker from "../../../server/actions/action_resetTaker";
+import query_getTakerFromCookies from "../../../../server/queries/query_getTakerFromCookies";
+import action_resetTaker from "../../../../server/actions/action_resetTaker";
 import type { ActivitiesCollection } from "src/server/collections";
 import getDB from "src/server/db";
 import { ActivitiesCollectionName } from "src/server/collections";
+import { WEEKLY_GOALS } from "src/server/constants";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { PlusIcon } from "lucide-react";
 
 export const metadata: Metadata = {
 	title: "Basketball Attendance - Training History",
-};
-
-const WEEKLY_GOALS = {
-	thirtyMin: {
-		personalTechnique: 2,
-		probabilityPractice: 1,
-		buddyTraining: 1,
-	},
-	enduranceRun: 2,
-	normalSession: {
-		trainWithCoach: 1,
-		trainNewbies: 1,
-	},
 };
 
 async function query_getAthleteAttendanceData(
@@ -137,17 +123,6 @@ export default async function HistoryPage({
 					goals={WEEKLY_GOALS.normalSession}
 				/>
 			</div>
-
-			<div className="h-[38px]" />
-
-			<Link
-				href={"/attendance/activity"}
-				className="fixed bottom-12 right-6 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-full shadow-lg flex items-center gap-3 transition-all hover:shadow-xl"
-				title="Add new activity"
-			>
-				<PlusIcon className="w-6 h-6" />
-				<span className="font-medium hidden sm:inline">New Activity</span>
-			</Link>
 		</main>
 	);
 }

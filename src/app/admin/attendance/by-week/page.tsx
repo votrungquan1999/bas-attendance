@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
 import query_getAttendanceData from "./query_getAttendanceData";
 import type { Taker } from "src/app/attendance/taker/getTakers";
 import query_getEligibleAthletes from "./query_getEligibleAthletes";
+import { WEEKLY_GOALS } from "src/server/constants";
 
 // Mock data for demonstration, keep it here for now
 // const mockAttendanceData: {
@@ -284,32 +285,6 @@ import query_getEligibleAthletes from "./query_getEligibleAthletes";
 // 		],
 // 	},
 // ];
-
-interface WeeklyGoals {
-	thirtyMin: {
-		personalTechnique: number;
-		probabilityPractice: number;
-		buddyTraining: number;
-	};
-	enduranceRun: number;
-	normalSession: {
-		trainWithCoach: number;
-		trainNewbies: number;
-	};
-}
-
-const WEEKLY_GOALS: WeeklyGoals = {
-	thirtyMin: {
-		personalTechnique: 2,
-		probabilityPractice: 1,
-		buddyTraining: 1,
-	},
-	enduranceRun: 2,
-	normalSession: {
-		trainWithCoach: 1,
-		trainNewbies: 1,
-	},
-};
 
 interface RemainingGoals {
 	thirtyMin?: {

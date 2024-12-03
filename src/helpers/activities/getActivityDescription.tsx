@@ -1,4 +1,4 @@
-import type { CompletedActivity } from "src/app/attendance/activity/types";
+import type { CompletedActivity } from "src/server/types";
 
 export default function getActivityDescription(
 	activity: CompletedActivity,

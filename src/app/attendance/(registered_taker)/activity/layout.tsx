@@ -1,9 +1,7 @@
 import { ActivityProvider } from "./ActivityContext";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { HistoryIcon } from "lucide-react";
-import query_getTakerFromCookies from "../../../server/queries/query_getTakerFromCookies";
-import action_resetTaker from "../../../server/actions/action_resetTaker";
+import query_getTakerFromCookies from "src/server/queries/query_getTakerFromCookies";
+import action_resetTaker from "src/server/actions/action_resetTaker";
 
 export const metadata: Metadata = {
 	title: "Basketball Attendance - Add New Activity",
@@ -40,17 +38,6 @@ export default async function ActivityLayout({
 			</header>
 
 			<ActivityProvider>{children}</ActivityProvider>
-
-			<div className="h-[38px]" />
-
-			<Link
-				href={"/attendance/history"}
-				className="fixed bottom-12 right-6 bg-slate-600 hover:bg-slate-800 text-white px-3 sm:px-4 py-2 rounded-full shadow-lg flex items-center gap-3 transition-all hover:shadow-xl"
-				title="View my training history"
-			>
-				<HistoryIcon className="w-6 h-6" />
-				<span className="font-medium hidden sm:inline">History</span>
-			</Link>
 		</main>
 	);
 }

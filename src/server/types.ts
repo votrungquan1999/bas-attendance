@@ -68,3 +68,16 @@ export type CompletedActivity =
 	| CompletedEnduranceRun
 	| CompletedOtherSession
 	| CompletedStandardSession;
+
+export interface WeeklyGoals {
+	thirtyMin: {
+		personalTechnique: number;
+		probabilityPractice: number;
+		buddyTraining: number;
+	};
+	enduranceRun: number;
+	normalSession: {
+		trainWithCoach: number;
+		trainNewbies: number;
+	};
+}

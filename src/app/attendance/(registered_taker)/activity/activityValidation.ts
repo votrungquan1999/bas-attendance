@@ -1,5 +1,5 @@
 import type { ActivityState } from "./ActivityContext";
-import type { CompletedActivity } from "./types";
+import type { CompletedActivity } from "../../../../server/types";
 
 export const isActivityComplete = (
 	state: ActivityState,
