@@ -8,7 +8,7 @@ export default function RegisteredTakerLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="bg-gray-50 min-h-screen flex flex-col">
+		<div className="bg-gray-50 flex-1 flex flex-col">
 			<NavFooter />
 
 			<main className="flex-1 sm:pl-[72px]">

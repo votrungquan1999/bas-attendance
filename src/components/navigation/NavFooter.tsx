@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Trophy, PlusCircle, History } from "lucide-react";
+import { PlusCircle, History, Award } from "lucide-react";
 import {
 	Tooltip,
 	TooltipContent,
@@ -24,7 +24,7 @@ const navItems = [
 	{
 		label: "Achievements",
 		href: "/attendance/achievement",
-		icon: Trophy,
+		icon: Award,
 	},
 ];
 
