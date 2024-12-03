@@ -1,5 +1,13 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { Trophy, PlusCircle, History } from "lucide-react";
+import CodeAuthWrapper from "src/components/CodeAuthWrapper";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "src/shadcn/components/ui/tooltip";
 
 const navItems = [
 	{
@@ -20,88 +28,79 @@ const navItems = [
 	},
 ];
 
-function NavLink({
-	href,
-	label,
-	icon: Icon,
-	isActive,
-	primary,
-}: {
-	href: string;
-	label: string;
-	icon: React.ElementType;
-	isActive: boolean;
-	primary?: boolean;
-}) {
+function DesktopNav() {
 	return (
-		<Link
-			href={href}
-			className={`flex flex-col items-center p-3 sm:flex-row sm:gap-2 sm:px-4 sm:py-2 
-        rounded-md transition-colors ${
-					primary
-						? "text-blue-600 hover:text-blue-700"
-						: isActive
-							? "text-blue-600"
-							: "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-				}`}
-		>
-			<Icon
-				className={`h-6 w-6 sm:h-4 sm:w-4 ${primary ? "sm:h-5 sm:w-5" : ""}`}
-			/>
-			<span className="hidden sm:inline text-sm font-medium">{label}</span>
-		</Link>
-	);
-}
-
-function Navigation({ pathname }: { pathname: string }) {
-	return (
-		<>
-			{/* Desktop Navigation - Top Tabs */}
-			<nav className="hidden sm:block border-b bg-white">
-				<div className="max-w-4xl mx-auto px-4">
-					<div className="flex justify-center space-x-1 py-2">
+		<div className="hidden sm:block fixed left-0 top-0 h-full">
+			<div className="flex flex-col h-full py-8 px-4 bg-white border-r">
+				<TooltipProvider delayDuration={0}>
+					<div className="flex-1 flex flex-col items-center gap-8">
 						{navItems.map((item) => (
-							<NavLink
-								key={item.href}
-								{...item}
-								isActive={pathname.startsWith(item.href)}
-							/>
+							<Tooltip key={item.href}>
+								<TooltipTrigger asChild>
+									<Link href={item.href} className="group flex items-center">
+										<div className="p-3 rounded-xl transition-colors group-hover:bg-gray-100">
+											<item.icon
+												className={`h-5 w-5 transition-colors ${
+													item.primary
+														? "text-blue-500"
+														: "text-gray-600 group-hover:text-gray-900"
+												}`}
+											/>
+										</div>
+									</Link>
+								</TooltipTrigger>
+								<TooltipContent side="right" sideOffset={10}>
+									{item.label}
+								</TooltipContent>
+							</Tooltip>
 						))}
 					</div>
-				</div>
-			</nav>
-
-			{/* Mobile Navigation - Bottom Bar */}
-			<nav className="sm:hidden fixed bottom-9 left-0 right-0 border-t bg-white z-10">
-				<div className="flex justify-around items-center">
-					{navItems.map((item) => (
-						<NavLink
-							key={item.href}
-							{...item}
-							isActive={pathname.startsWith(item.href)}
-						/>
-					))}
-				</div>
-			</nav>
-		</>
+				</TooltipProvider>
+			</div>
+		</div>
 	);
 }
 
-export default function AttendanceLayout({
+function MobileNav() {
+	return (
+		<nav className="sm:hidden fixed bottom-9 left-0 right-0 border-t bg-white z-10">
+			<div className="flex justify-around items-center">
+				{navItems.map((item) => (
+					<Link
+						key={item.href}
+						href={item.href}
+						className="flex flex-col items-center p-3"
+					>
+						<item.icon
+							className={`h-6 w-6 transition-colors ${
+								item.primary ? "text-blue-500" : "text-gray-600"
+							}`}
+						/>
+					</Link>
+				))}
+			</div>
+		</nav>
+	);
+}
+
+export default function RegisteredTakerLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	const pathname = "/attendance/activity";
-
 	return (
-		<div className="bg-gray-50 flex-1 flex flex-col relative">
-			<Navigation pathname={pathname} />
+		<div className="bg-gray-50 min-h-screen flex">
+			<DesktopNav />
+			<MobileNav />
 
-			<main className="flex-1">{children}</main>
+			<main className="flex-1 sm:pl-[72px]">
+				<Suspense fallback={<div>Loading...</div>}>
+					<CodeAuthWrapper>{children}</CodeAuthWrapper>
+				</Suspense>
+			</main>
 
 			{/* Navigation Placeholder for Mobile */}
-			<div className="sm:hidden h-[52px]" />
+			<div className="sm:hidden h-[52px]" aria-hidden="true" />
 		</div>
 	);
 }
