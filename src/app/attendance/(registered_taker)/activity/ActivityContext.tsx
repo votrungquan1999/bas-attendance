@@ -12,7 +12,7 @@ import type {
 	ThirtyMinutesSessionActivity,
 	ProbabilityActivity,
 	NormalSessionActivity,
-} from "./types";
+} from "../../../../server/types";
 import { DateTime } from "luxon";
 
 export interface ActivityState {

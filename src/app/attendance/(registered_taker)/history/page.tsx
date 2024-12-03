@@ -4,8 +4,8 @@ import NormalLongSessionsProgress from "src/components/attendance_records/Normal
 import EnduranceRunsProgress from "src/components/attendance_records/EnduranceRunsProgress";
 import getWeekRange, { type WeekRange } from "src/helpers/weekRange";
 import groupActivities from "src/helpers/activities/groupActivities";
-import query_getTakerFromCookies from "../../../server/queries/query_getTakerFromCookies";
-import action_resetTaker from "../../../server/actions/action_resetTaker";
+import query_getTakerFromCookies from "../../../../server/queries/query_getTakerFromCookies";
+import action_resetTaker from "../../../../server/actions/action_resetTaker";
 import type { ActivitiesCollection } from "src/server/collections";
 import getDB from "src/server/db";
 import { ActivitiesCollectionName } from "src/server/collections";

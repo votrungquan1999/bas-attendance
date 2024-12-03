@@ -4,7 +4,7 @@ import {
 	PopoverTrigger,
 } from "src/shadcn/components/ui/popover";
 import GoalIndicator from "./GoalIndicator";
-import type { CompletedActivity } from "src/app/attendance/activity/types";
+import type { CompletedActivity } from "src/server/types";
 import ActivitySection from "./ActivitySection";
 
 interface GroupedThirtyMinSessions {

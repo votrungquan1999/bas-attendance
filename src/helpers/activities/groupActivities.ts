@@ -1,4 +1,4 @@
-import type { CompletedActivity } from "src/app/attendance/activity/types";
+import type { CompletedActivity } from "src/server/types";
 
 const sortByDate = (a: CompletedActivity, b: CompletedActivity) =>
 	b.submittedAt - a.submittedAt;

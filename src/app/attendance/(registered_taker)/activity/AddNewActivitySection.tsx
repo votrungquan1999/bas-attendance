@@ -14,14 +14,14 @@ import type {
 	ThirtyMinutesSessionActivity,
 	ProbabilityActivity,
 	NormalSessionActivity,
-} from "./types";
+} from "../../../../server/types";
 import { useActivity } from "./ActivityContext";
 import { cn } from "src/shadcn/lib/utils";
 import { isActivityComplete } from "./activityValidation";
 import { useState, useTransition, useEffect } from "react";
-import action_submitActivity from "../../../server/actions/action_submitActivity";
 import { Check, Loader2 } from "lucide-react";
 import { DateTime } from "luxon";
+import action_submitActivity from "src/server/actions/action_submitActivity";
 
 interface AddNewActivitySectionProps {
 	attendanceId: string;

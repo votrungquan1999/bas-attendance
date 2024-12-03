@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getTakers } from "../../app/attendance/taker/getTakers";
-import { getRegisterTake } from "../../app/attendance/activity/getRegisterTake";
+import { getRegisterTake } from "../../app/attendance/(registered_taker)/activity/getRegisterTake";
 import action_resetTaker from "../actions/action_resetTaker";
 
 export default async function query_getTakerFromCookies(): Promise<{

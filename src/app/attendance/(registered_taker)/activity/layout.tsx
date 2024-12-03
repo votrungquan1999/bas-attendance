@@ -1,7 +1,7 @@
 import { ActivityProvider } from "./ActivityContext";
 import type { Metadata } from "next";
-import query_getTakerFromCookies from "../../../server/queries/query_getTakerFromCookies";
-import action_resetTaker from "../../../server/actions/action_resetTaker";
+import query_getTakerFromCookies from "src/server/queries/query_getTakerFromCookies";
+import action_resetTaker from "src/server/actions/action_resetTaker";
 
 export const metadata: Metadata = {
 	title: "Basketball Attendance - Add New Activity",
