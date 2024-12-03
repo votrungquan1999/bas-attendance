@@ -9,23 +9,11 @@ import action_resetTaker from "../../../../server/actions/action_resetTaker";
 import type { ActivitiesCollection } from "src/server/collections";
 import getDB from "src/server/db";
 import { ActivitiesCollectionName } from "src/server/collections";
+import { WEEKLY_GOALS } from "src/server/constants";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
 	title: "Basketball Attendance - Training History",
-};
-
-const WEEKLY_GOALS = {
-	thirtyMin: {
-		personalTechnique: 2,
-		probabilityPractice: 1,
-		buddyTraining: 1,
-	},
-	enduranceRun: 2,
-	normalSession: {
-		trainWithCoach: 1,
-		trainNewbies: 1,
-	},
 };
 
 async function query_getAthleteAttendanceData(
