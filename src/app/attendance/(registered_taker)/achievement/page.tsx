@@ -1,68 +1,8 @@
 import { Suspense } from "react";
-
-interface Achievement {
-	longestStreak: {
-		weeks: number;
-		athleteName: string;
-	};
-	runningStreak: {
-		weeks: number;
-		athleteName: string;
-	};
-	bestPerformance: {
-		minutesPerLap: number;
-		laps: number;
-		minutes: number;
-		athleteName: string;
-	};
-	topAttendance: Array<{
-		id: string;
-		name: string;
-		weeks: number;
-	}>;
-	topRunning: Array<{
-		id: string;
-		name: string;
-		weeks: number;
-	}>;
-}
-
-// Mocked data for development
-async function getTopAchievements(): Promise<Achievement> {
-	return {
-		longestStreak: {
-			weeks: 12,
-			athleteName: "Sarah Johnson",
-		},
-		runningStreak: {
-			weeks: 8,
-			athleteName: "Michael Chen",
-		},
-		bestPerformance: {
-			minutesPerLap: 2,
-			laps: 15,
-			minutes: 30,
-			athleteName: "David Smith",
-		},
-		topAttendance: [
-			{ id: "1", name: "Sarah Johnson", weeks: 12 },
-			{ id: "2", name: "James Wilson", weeks: 10 },
-			{ id: "3", name: "Emma Davis", weeks: 9 },
-			{ id: "4", name: "Alex Thompson", weeks: 8 },
-			{ id: "5", name: "Lisa Anderson", weeks: 7 },
-		],
-		topRunning: [
-			{ id: "1", name: "Michael Chen", weeks: 8 },
-			{ id: "2", name: "Jessica Lee", weeks: 7 },
-			{ id: "3", name: "Robert Taylor", weeks: 6 },
-			{ id: "4", name: "Anna Martinez", weeks: 5 },
-			{ id: "5", name: "Kevin Brown", weeks: 4 },
-		],
-	};
-}
+import query_getAchievements from "src/server/queries/query_getAchievements";
 
 async function AchievementStats() {
-	const achievements = await getTopAchievements();
+	const achievements = await query_getAchievements();
 
 	return (
 		<div className="max-w-4xl mx-auto p-4 sm:py-8 sm:px-4">
