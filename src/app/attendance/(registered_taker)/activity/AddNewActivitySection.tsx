@@ -54,7 +54,7 @@ export default function AddNewActivitySection({
 	const dateOptions = getDateOptions();
 
 	return (
-		<div className="max-w-2xl mx-auto p-6 space-y-8">
+		<div className="max-w-2xl mx-auto py-6 px-2 space-y-8">
 			<div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
 				<div className="space-y-4">
 					<div className="space-y-2">
