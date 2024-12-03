@@ -29,7 +29,7 @@ export default function RootLayout({
 			<body className="min-h-dvh flex flex-col font-inter">
 				<div className="flex-1 flex flex-col">{children}</div>
 				{/* footer placeholder so that it does not cover the content */}
-				<div className="h-[40px] w-full" />
+				<div className="h-[36px] sm:h-[40px] w-full" />
 				<div className="fixed bottom-0 w-full">
 					<Footer />
 				</div>
