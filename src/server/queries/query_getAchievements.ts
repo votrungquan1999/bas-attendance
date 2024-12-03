@@ -13,6 +13,7 @@ import getDB from "src/server/db";
 import query_getEligibleAthletes from "src/app/admin/attendance/by-week/query_getEligibleAthletes";
 import { WEEKLY_GOALS } from "src/server/constants";
 import { unstable_cacheLife as cacheLife } from "next/cache";
+import { DateTime } from "luxon";
 
 interface Achievement {
 	longestStreak: {
@@ -41,12 +42,11 @@ interface Achievement {
 	}>;
 }
 
-function getWeekNumber(timestamp: number): number {
-	const date = new Date(timestamp);
-	date.setHours(0, 0, 0, 0);
-	date.setDate(date.getDate() + 4 - (date.getDay() || 7));
-	const yearStart = new Date(date.getFullYear(), 0, 1);
-	return Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+function getWeekKey(timestamp: number): string {
+	const dt = DateTime.fromMillis(timestamp, {
+		zone: "Asia/Saigon",
+	});
+	return `${dt.year}-${dt.weekNumber}`;
 }
 
 function isWeekCompleted(activities: CompletedActivity[]): boolean {
@@ -84,24 +84,44 @@ function isRunningWeekCompleted(activities: CompletedActivity[]): boolean {
 }
 
 function calculateStreak(
-	weeks: Map<number, CompletedActivity[]>,
+	weeks: Map<string, CompletedActivity[]>,
 	checkFn: (activities: CompletedActivity[]) => boolean,
 ): number {
 	let maxStreak = 0;
 	let currentStreak = 0;
-	let lastWeek: number | null = null;
 
-	// Sort weeks in ascending order
-	const sortedWeeks = Array.from(weeks.entries()).sort(([a], [b]) => a - b);
+	let lastWeekKey: string | null = null;
 
-	for (const [week, activities] of sortedWeeks) {
-		if ((lastWeek === null || week === lastWeek + 1) && checkFn(activities)) {
-			currentStreak++;
-		} else {
+	// Sort weeks in ascending order by year and week number
+	const sortedWeeks = Array.from(weeks.entries()).sort(([a], [b]) => {
+		const [yearA, weekA] = a.split("-").map(Number);
+		const [yearB, weekB] = b.split("-").map(Number);
+		if (yearA !== yearB) return yearA - yearB;
+		return weekA - weekB;
+	});
+
+	for (const [weekKey, activities] of sortedWeeks) {
+		if (lastWeekKey === null) {
 			currentStreak = checkFn(activities) ? 1 : 0;
+		} else {
+			const [lastYear, lastWeek] = lastWeekKey.split("-").map(Number);
+			const [currentYear, currentWeek] = weekKey.split("-").map(Number);
+
+			const isConsecutive =
+				(currentYear === lastYear && currentWeek === lastWeek + 1) ||
+				(currentYear === lastYear + 1 &&
+					lastWeek ===
+						DateTime.local(lastYear, { zone: "Asia/Saigon" }).weeksInWeekYear &&
+					currentWeek === 1);
+
+			if (isConsecutive && checkFn(activities)) {
+				currentStreak++;
+			} else {
+				currentStreak = checkFn(activities) ? 1 : 0;
+			}
 		}
 		maxStreak = Math.max(maxStreak, currentStreak);
-		lastWeek = week;
+		lastWeekKey = weekKey;
 	}
 
 	return maxStreak;
@@ -131,8 +151,8 @@ export default async function query_getAchievements(): Promise<Achievement> {
 			.map(([attendanceId, activities]) => {
 				if (!athleteMap.has(attendanceId)) return null;
 
-				// Group activities by week
-				const weeklyActivities = new Map<number, CompletedActivity[]>();
+				// Group activities by week-year instead of just week
+				const weeklyActivities = new Map<string, CompletedActivity[]>();
 				let bestPerformance: {
 					minutesPerLap: number;
 					laps: number;
@@ -141,12 +161,12 @@ export default async function query_getAchievements(): Promise<Achievement> {
 
 				// Process all activities
 				for (const activity of activities) {
-					const weekNumber = getWeekNumber(activity.activityTimestamp);
+					const weekKey = getWeekKey(activity.activityTimestamp);
 
-					if (!weeklyActivities.has(weekNumber)) {
-						weeklyActivities.set(weekNumber, []);
+					if (!weeklyActivities.has(weekKey)) {
+						weeklyActivities.set(weekKey, []);
 					}
-					weeklyActivities.get(weekNumber)?.push(activity);
+					weeklyActivities.get(weekKey)?.push(activity);
 
 					if (activity.activity === "endurance-run") {
 						const runActivity = activity as CompletedEnduranceRun;
