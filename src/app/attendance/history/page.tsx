@@ -10,8 +10,6 @@ import type { ActivitiesCollection } from "src/server/collections";
 import getDB from "src/server/db";
 import { ActivitiesCollectionName } from "src/server/collections";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { PlusIcon } from "lucide-react";
 
 export const metadata: Metadata = {
 	title: "Basketball Attendance - Training History",
@@ -137,17 +135,6 @@ export default async function HistoryPage({
 					goals={WEEKLY_GOALS.normalSession}
 				/>
 			</div>
-
-			<div className="h-[38px]" />
-
-			<Link
-				href={"/attendance/activity"}
-				className="fixed bottom-12 right-6 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 rounded-full shadow-lg flex items-center gap-3 transition-all hover:shadow-xl"
-				title="Add new activity"
-			>
-				<PlusIcon className="w-6 h-6" />
-				<span className="font-medium hidden sm:inline">New Activity</span>
-			</Link>
 		</main>
 	);
 }
