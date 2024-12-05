@@ -173,7 +173,11 @@ export default async function query_getAchievements(): Promise<Achievement> {
 						const laps = Number(runActivity.laps);
 						const minutes = Number(runActivity.minutes);
 
-						if (Number.isFinite(laps) && Number.isFinite(minutes) && laps > 0) {
+						if (
+							Number.isFinite(laps) &&
+							Number.isFinite(minutes) &&
+							laps >= 6 // Only consider performances with at least 6 laps
+						) {
 							const minutesPerLap = minutes / laps;
 							if (
 								!bestPerformance ||

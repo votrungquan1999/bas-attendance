@@ -64,14 +64,23 @@ async function AchievementStats() {
 						<h2 className="font-semibold text-gray-900">Best Running Pace</h2>
 					</div>
 					<div className="pl-2">
-						<p className="text-3xl font-bold text-purple-600 mb-1">
-							{achievements.bestPerformance.minutesPerLap.toFixed(1)} min/lap
-						</p>
-						<p className="text-sm text-gray-500">
-							{achievements.bestPerformance.laps} laps in{" "}
-							{achievements.bestPerformance.minutes} mins by{" "}
-							{achievements.bestPerformance.athleteName}
-						</p>
+						{achievements.bestPerformance.laps >= 6 ? (
+							<>
+								<p className="text-3xl font-bold text-purple-600 mb-1">
+									{achievements.bestPerformance.minutesPerLap.toFixed(1)}{" "}
+									min/lap
+								</p>
+								<p className="text-sm text-gray-500">
+									{achievements.bestPerformance.laps} laps in{" "}
+									{achievements.bestPerformance.minutes} mins by{" "}
+									{achievements.bestPerformance.athleteName}
+								</p>
+							</>
+						) : (
+							<p className="text-sm text-gray-500">
+								No qualifying records yet (minimum 6 laps)
+							</p>
+						)}
 					</div>
 				</div>
 			</div>
@@ -81,9 +90,14 @@ async function AchievementStats() {
 				{/* Activity Streaks */}
 				{achievements.topAttendance.length > 0 && (
 					<div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
-						<h2 className="font-semibold text-gray-900 mb-4">
-							Top Activity Streaks
-						</h2>
+						<div className="mb-4">
+							<h2 className="font-semibold text-gray-900">
+								Top Activity Streaks
+							</h2>
+							<p className="text-sm text-gray-500 mt-1">
+								Athletes who consistently completed all weekly activities
+							</p>
+						</div>
 						<div className="space-y-3">
 							{achievements.topAttendance.map((athlete, index) => (
 								<div
@@ -94,7 +108,9 @@ async function AchievementStats() {
 										<span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-50 text-blue-600 text-sm font-medium">
 											{index + 1}
 										</span>
-										<span className="text-gray-900">{athlete.name}</span>
+										<span className="text-gray-900 font-medium">
+											{athlete.name}
+										</span>
 									</div>
 									<span className="font-medium text-blue-600">
 										{athlete.weeks} weeks
@@ -108,9 +124,14 @@ async function AchievementStats() {
 				{/* Running Streaks */}
 				{achievements.topRunning.length > 0 && (
 					<div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
-						<h2 className="font-semibold text-gray-900 mb-4">
-							Top Running Streaks
-						</h2>
+						<div className="mb-4">
+							<h2 className="font-semibold text-gray-900">
+								Top Running Streaks
+							</h2>
+							<p className="text-sm text-gray-500 mt-1">
+								Athletes who maintained consistent running performance
+							</p>
+						</div>
 						<div className="space-y-3">
 							{achievements.topRunning.map((athlete, index) => (
 								<div
@@ -121,7 +142,9 @@ async function AchievementStats() {
 										<span className="flex items-center justify-center w-6 h-6 rounded-full bg-green-50 text-green-600 text-sm font-medium">
 											{index + 1}
 										</span>
-										<span className="text-gray-900">{athlete.name}</span>
+										<span className="text-gray-900 font-medium">
+											{athlete.name}
+										</span>
 									</div>
 									<span className="font-medium text-green-600">
 										{athlete.weeks} weeks
