@@ -8,9 +8,16 @@ import getSession from "src/server/next-auth/getSession";
 
 export default async function UserPopover() {
 	const session = await getSession();
-
 	const userInitial =
 		session?.user?.name?.[0] ?? session?.user?.email?.[0] ?? "?";
+
+	if (!session) {
+		return (
+			<div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-600 text-lg font-semibold transition-colors hover:bg-gray-500">
+				{userInitial.toUpperCase()}
+			</div>
+		);
+	}
 
 	return (
 		<Popover>
@@ -26,10 +33,10 @@ export default async function UserPopover() {
 			<PopoverContent className="w-64" align="end">
 				<div className="space-y-4">
 					<div className="space-y-2">
-						{session?.user?.name && (
+						{session.user.name && (
 							<p className="font-medium text-slate-900">{session.user.name}</p>
 						)}
-						{session?.user?.email && (
+						{session.user.email && (
 							<p className="text-sm text-slate-500">{session.user.email}</p>
 						)}
 					</div>
