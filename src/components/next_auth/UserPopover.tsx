@@ -13,7 +13,7 @@ export default async function UserPopover() {
 
 	if (!session) {
 		return (
-			<div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-600 text-lg font-semibold transition-colors hover:bg-gray-500">
+			<div className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-slate-200 text-lg font-semibold text-slate-600 transition-colors hover:bg-slate-300 shadow">
 				{userInitial.toUpperCase()}
 			</div>
 		);
@@ -24,7 +24,7 @@ export default async function UserPopover() {
 			<PopoverTrigger asChild>
 				<button
 					type="button"
-					className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-600 text-lg font-semibold transition-colors hover:bg-gray-500"
+					className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200 text-lg font-semibold text-slate-600 transition-colors hover:bg-slate-300 shadow"
 				>
 					{userInitial.toUpperCase()}
 				</button>
