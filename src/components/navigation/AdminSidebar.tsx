@@ -20,11 +20,11 @@ export default function AdminSidebar() {
 							Back to Attendance
 						</AdminNavLink>
 
-						<div className="mt-6">
-							<div className="mb-3 flex h-6 items-center px-2 text-xs font-medium uppercase text-slate-400">
-								<span className="whitespace-nowrap opacity-0 transition-opacity duration-300 @[12rem]/sidebar:opacity-100">
+						<div>
+							<div className="h-0 overflow-hidden transition-[height,margin] duration-300 @[12rem]/sidebar:h-[2.25rem]">
+								<div className="px-2 text-xs font-medium uppercase text-slate-400">
 									Admin Menu
-								</span>
+								</div>
 							</div>
 							<div className="space-y-2">
 								<AdminNavLink
