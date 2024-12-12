@@ -13,7 +13,7 @@ interface AdminNavLinkProps {
 
 export function AdminNavLink({ href, icon, children }: AdminNavLinkProps) {
 	const pathname = usePathname();
-	const isActive = pathname === href;
+	const isActive = pathname.startsWith(href);
 
 	return (
 		<Link
