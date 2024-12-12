@@ -7,8 +7,10 @@ export default function AdminHeader({
 }: { children: React.ReactNode }) {
 	return (
 		<header className="flex h-[72px] w-full items-center border-b border-slate-200 bg-white shadow">
-			{children}
+			<div className="px-6">{children}</div>
+
 			<div className="flex-1" />
+
 			<div className="px-6">
 				<Suspense fallback={<UserPopoverSkeleton />}>
 					<UserPopover />

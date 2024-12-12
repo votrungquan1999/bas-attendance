@@ -15,12 +15,6 @@ export function AdminNavLink({ href, icon, children }: AdminNavLinkProps) {
 	const pathname = usePathname();
 	const isActive = pathname === href;
 
-	console.log({
-		pathname,
-		href,
-		isActive,
-	});
-
 	return (
 		<Link
 			href={href}
