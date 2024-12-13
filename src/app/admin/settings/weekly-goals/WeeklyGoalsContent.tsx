@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { WEEKLY_GOALS } from "src/server/constants";
-import type { WeeklyGoals } from "src/server/types";
 import { Trash2 } from "lucide-react";
 import {
 	Select,
@@ -11,7 +9,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "src/shadcn/components/ui/select";
-// import { cn } from "src/shadcn/lib/utils";
+import WeekRangeNav from "src/components/attendance_records/WeekRangeNav";
+import { useEffect, useRef, useState } from "react";
+import { useWeeklyGoals } from "./by-week/WeeklyGoalsProvider";
+import type { WeekRange } from "src/helpers/weekRange";
 
 // Helper function to generate number options
 const generateOptions = (max: number) => {
@@ -147,7 +148,6 @@ function GoalSection({
 	activity,
 }: GoalSectionProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
-
 	const [goalSectionHeight, setGoalSectionHeight] = useState<number | "auto">(
 		"auto",
 	);
@@ -176,10 +176,6 @@ function GoalSection({
 			<section
 				className="transition-[height] duration-300 ease-in-out overflow-hidden p-6 pt-1"
 				style={{
-					// add 28 for the padding added (24 bottom + 4 top)
-					// need to add padding here, instead of the outer section
-					// because fix height + without padding + overflow-hidden will cause the
-					// outline to be cut off
 					height:
 						goalSectionHeight === "auto" ? "auto" : goalSectionHeight + 28,
 				}}
@@ -196,53 +192,43 @@ function GoalSection({
 	);
 }
 
-export default function WeeklyGoalsSettings() {
-	const [goals, setGoals] = useState<WeeklyGoals>(WEEKLY_GOALS);
-	const [isSaving, setIsSaving] = useState(false);
-
-	// Helper functions to check if all goals in a section are 0
-	const allThirtyMinGoalsAreZero = () =>
-		goals.thirtyMin.personalTechnique === 0 &&
-		goals.thirtyMin.probabilityPractice === 0 &&
-		goals.thirtyMin.buddyTraining === 0;
-
-	const allNormalSessionGoalsAreZero = () =>
-		goals.normalSession.trainWithCoach === 0 &&
-		goals.normalSession.trainNewbies === 0;
-
-	const handleSave = async () => {
-		setIsSaving(true);
-		try {
-			await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulated API call
-		} catch (error) {
-			console.error("Failed to save goals:", error);
-		} finally {
-			setIsSaving(false);
-		}
-	};
+export default function WeeklyGoalsContent({
+	weekRange,
+}: {
+	weekRange: WeekRange;
+}) {
+	const {
+		state,
+		dispatch,
+		allThirtyMinGoalsAreZero,
+		allNormalSessionGoalsAreZero,
+		handleSave,
+	} = useWeeklyGoals();
+	const { goals, isSaving } = state;
 
 	return (
 		<div className="p-6 max-w-4xl mx-auto">
+			<WeekRangeNav weekRange={weekRange} />
 			<div className="space-y-6">
 				<GoalSection
 					title="30 Minute Sessions"
 					showDelete={!allThirtyMinGoalsAreZero()}
 					onDelete={() =>
-						setGoals((prev) => ({
-							...prev,
-							thirtyMin: {
+						dispatch({
+							type: "SET_THIRTY_MIN_GOALS",
+							payload: {
 								personalTechnique: 0,
 								probabilityPractice: 0,
 								buddyTraining: 0,
 							},
-						}))
+						})
 					}
 					isEmpty={allThirtyMinGoalsAreZero()}
 					onAdd={() =>
-						setGoals((prev) => ({
-							...prev,
-							thirtyMin: WEEKLY_GOALS.thirtyMin,
-						}))
+						dispatch({
+							type: "SET_THIRTY_MIN_GOALS",
+							payload: WEEKLY_GOALS.thirtyMin,
+						})
 					}
 					activity="30 minute sessions"
 				>
@@ -253,10 +239,10 @@ export default function WeeklyGoalsSettings() {
 							value={goals.thirtyMin.personalTechnique}
 							defaultValue={WEEKLY_GOALS.thirtyMin.personalTechnique}
 							onValueChange={(value) =>
-								setGoals((prev) => ({
-									...prev,
-									thirtyMin: { ...prev.thirtyMin, personalTechnique: value },
-								}))
+								dispatch({
+									type: "UPDATE_PERSONAL_TECHNIQUE",
+									payload: value,
+								})
 							}
 						/>
 						<ActivityInput
@@ -265,13 +251,10 @@ export default function WeeklyGoalsSettings() {
 							value={goals.thirtyMin.probabilityPractice}
 							defaultValue={WEEKLY_GOALS.thirtyMin.probabilityPractice}
 							onValueChange={(value) =>
-								setGoals((prev) => ({
-									...prev,
-									thirtyMin: {
-										...prev.thirtyMin,
-										probabilityPractice: value,
-									},
-								}))
+								dispatch({
+									type: "UPDATE_PROBABILITY_PRACTICE",
+									payload: value,
+								})
 							}
 						/>
 						<ActivityInput
@@ -280,10 +263,10 @@ export default function WeeklyGoalsSettings() {
 							value={goals.thirtyMin.buddyTraining}
 							defaultValue={WEEKLY_GOALS.thirtyMin.buddyTraining}
 							onValueChange={(value) =>
-								setGoals((prev) => ({
-									...prev,
-									thirtyMin: { ...prev.thirtyMin, buddyTraining: value },
-								}))
+								dispatch({
+									type: "UPDATE_BUDDY_TRAINING",
+									payload: value,
+								})
 							}
 						/>
 					</div>
@@ -293,17 +276,17 @@ export default function WeeklyGoalsSettings() {
 					title="Endurance Runs"
 					showDelete={goals.enduranceRun !== 0}
 					onDelete={() =>
-						setGoals((prev) => ({
-							...prev,
-							enduranceRun: 0,
-						}))
+						dispatch({
+							type: "SET_ENDURANCE_RUN",
+							payload: 0,
+						})
 					}
 					isEmpty={goals.enduranceRun === 0}
 					onAdd={() =>
-						setGoals((prev) => ({
-							...prev,
-							enduranceRun: WEEKLY_GOALS.enduranceRun,
-						}))
+						dispatch({
+							type: "SET_ENDURANCE_RUN",
+							payload: WEEKLY_GOALS.enduranceRun,
+						})
 					}
 					activity="endurance run"
 				>
@@ -313,10 +296,10 @@ export default function WeeklyGoalsSettings() {
 						value={goals.enduranceRun}
 						defaultValue={WEEKLY_GOALS.enduranceRun}
 						onValueChange={(value) =>
-							setGoals((prev) => ({
-								...prev,
-								enduranceRun: value,
-							}))
+							dispatch({
+								type: "SET_ENDURANCE_RUN",
+								payload: value,
+							})
 						}
 						maxValue={5}
 					/>
@@ -326,20 +309,20 @@ export default function WeeklyGoalsSettings() {
 					title="Normal Sessions"
 					showDelete={!allNormalSessionGoalsAreZero()}
 					onDelete={() =>
-						setGoals((prev) => ({
-							...prev,
-							normalSession: {
+						dispatch({
+							type: "SET_NORMAL_SESSION_GOALS",
+							payload: {
 								trainWithCoach: 0,
 								trainNewbies: 0,
 							},
-						}))
+						})
 					}
 					isEmpty={allNormalSessionGoalsAreZero()}
 					onAdd={() =>
-						setGoals((prev) => ({
-							...prev,
-							normalSession: WEEKLY_GOALS.normalSession,
-						}))
+						dispatch({
+							type: "SET_NORMAL_SESSION_GOALS",
+							payload: WEEKLY_GOALS.normalSession,
+						})
 					}
 					activity="normal sessions"
 				>
@@ -350,13 +333,10 @@ export default function WeeklyGoalsSettings() {
 							value={goals.normalSession.trainWithCoach}
 							defaultValue={WEEKLY_GOALS.normalSession.trainWithCoach}
 							onValueChange={(value) =>
-								setGoals((prev) => ({
-									...prev,
-									normalSession: {
-										...prev.normalSession,
-										trainWithCoach: value,
-									},
-								}))
+								dispatch({
+									type: "UPDATE_TRAIN_WITH_COACH",
+									payload: value,
+								})
 							}
 						/>
 						<ActivityInput
@@ -365,13 +345,10 @@ export default function WeeklyGoalsSettings() {
 							value={goals.normalSession.trainNewbies}
 							defaultValue={WEEKLY_GOALS.normalSession.trainNewbies}
 							onValueChange={(value) =>
-								setGoals((prev) => ({
-									...prev,
-									normalSession: {
-										...prev.normalSession,
-										trainNewbies: value,
-									},
-								}))
+								dispatch({
+									type: "UPDATE_TRAIN_NEWBIES",
+									payload: value,
+								})
 							}
 						/>
 					</div>
