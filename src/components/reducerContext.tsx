@@ -1,15 +1,44 @@
 "use client";
 
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useReducer, type Dispatch } from "react";
 
-export default function createReducerContext<T, A>(
+export function createReducerContext<T, A>(
+	reducer: (state: T, action: A) => T,
+): {
+	ReducerContextProvider: ({
+		children,
+		value,
+	}: {
+		children: React.ReactNode;
+		value: T;
+	}) => JSX.Element;
+	useDispatch: () => Dispatch<A>;
+	useState: () => T;
+};
+
+export function createReducerContext<T, A>(
 	reducer: (state: T, action: A) => T,
 	initialState: T,
+): {
+	ReducerContextProvider: ({
+		children,
+		value,
+	}: {
+		children: React.ReactNode;
+		value?: T;
+	}) => JSX.Element;
+	useDispatch: () => Dispatch<A>;
+	useState: () => T;
+};
+
+export function createReducerContext<T, A>(
+	reducer: (state: T, action: A) => T,
+	initialState?: T,
 ) {
 	const ReducerContext = createContext<{
 		state: T;
 		dispatch: React.Dispatch<A>;
-	}>({ state: initialState, dispatch: () => {} });
+	} | null>(null);
 
 	function ReducerContextProvider({
 		children,
@@ -18,7 +47,12 @@ export default function createReducerContext<T, A>(
 		children: React.ReactNode;
 		value?: T;
 	}) {
-		const [state, dispatch] = useReducer(reducer, value ?? initialState);
+		const init = value ?? initialState;
+		if (!init) {
+			throw new Error("No initial state provided");
+		}
+
+		const [state, dispatch] = useReducer(reducer, init);
 
 		return (
 			<ReducerContext.Provider value={{ state, dispatch }}>
@@ -27,8 +61,27 @@ export default function createReducerContext<T, A>(
 		);
 	}
 
+	function WithoutInitialStateProvider({
+		children,
+		value,
+	}: {
+		children: React.ReactNode;
+		value: T;
+	}) {
+		return (
+			<ReducerContextProvider value={value}>{children}</ReducerContextProvider>
+		);
+	}
+
 	function useReducerContext() {
-		return useContext(ReducerContext);
+		const context = useContext(ReducerContext);
+		if (!context) {
+			throw new Error(
+				"useReducerContext must be used within a ReducerContextProvider",
+			);
+		}
+
+		return context;
 	}
 
 	function useDispatch() {
@@ -42,7 +95,9 @@ export default function createReducerContext<T, A>(
 	}
 
 	return {
-		ReducerContextProvider,
+		ReducerContextProvider: initialState
+			? ReducerContextProvider
+			: WithoutInitialStateProvider,
 		useDispatch,
 		useState,
 	};

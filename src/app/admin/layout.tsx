@@ -18,8 +18,12 @@ export default function AdminLayout({
 		<SidebarProvider>
 			<div className="flex-1 flex flex-col bg-gray-50">
 				<AdminSidebarRoot>
-					<AdminSidebar />
+					{/* this needs suspense since the usePathname required to be wrapped in a suspense, or build error */}
+					<Suspense fallback={<div>Loading...</div>}>
+						<AdminSidebar />
+					</Suspense>
 				</AdminSidebarRoot>
+
 				<MainAdminContent>
 					<div className="sticky top-0 z-10">{header}</div>
 

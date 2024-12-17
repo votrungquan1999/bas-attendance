@@ -396,8 +396,7 @@ export default async function ThisWeekPage({
 
 	return (
 		<div className="p-6">
-			<div className="flex justify-between items-center mb-4">
-				<h1 className="text-2xl font-bold">Attendance</h1>
+			<div className="flex justify-end items-center mb-4">
 				<WeekRangeNav
 					weekRange={weekRange}
 					disableNextWeek={weekOffset === 0}

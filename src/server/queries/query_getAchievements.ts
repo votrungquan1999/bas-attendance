@@ -12,7 +12,10 @@ import {
 import getDB from "src/server/db";
 import query_getEligibleAthletes from "src/app/admin/attendance/by-week/query_getEligibleAthletes";
 import { WEEKLY_GOALS } from "src/server/constants";
-import { unstable_cacheLife as cacheLife } from "next/cache";
+import {
+	unstable_cacheLife as cacheLife,
+	unstable_cacheTag as cacheTag,
+} from "next/cache";
 import { DateTime } from "luxon";
 
 interface Achievement {
@@ -129,6 +132,7 @@ function calculateStreak(
 
 export default async function query_getAchievements(): Promise<Achievement> {
 	cacheLife("hours");
+	cacheTag("achievement_aggregation");
 
 	const { db, close } = await getDB();
 
