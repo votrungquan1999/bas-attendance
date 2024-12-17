@@ -21,7 +21,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "src/shadcn/components/ui/popover";
-import createReducerContext from "src/components/reducerContext";
+import { createReducerContext } from "src/components/reducerContext";
 import { createContext, useContext, useEffect, useTransition } from "react";
 
 type ActionType =
