@@ -196,9 +196,8 @@ export default function WeeklyGoalsClientWrapper() {
 		dispatch,
 		allThirtyMinGoalsAreZero,
 		allNormalSessionGoalsAreZero,
-		handleSave,
 	} = useWeeklyGoals();
-	const { goals, isSaving } = state;
+	const goals = state;
 
 	return (
 		<div className="space-y-6">
@@ -345,17 +344,6 @@ export default function WeeklyGoalsClientWrapper() {
 					/>
 				</div>
 			</GoalSection>
-
-			<div className="flex justify-end">
-				<button
-					type="button"
-					className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-					onClick={handleSave}
-					disabled={isSaving}
-				>
-					{isSaving ? "Saving..." : "Save Changes"}
-				</button>
-			</div>
 		</div>
 	);
 }
