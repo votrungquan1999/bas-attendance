@@ -96,6 +96,13 @@ export default function WeekSelector({ now }: WeekSelectorProps) {
 		return Math.floor(diffInWeeks);
 	};
 
+	const isCurrentYear = (year: number) => currentDate.year === year;
+	const isCurrentMonth = (month: number) => currentDate.month === month;
+	const isCurrentWeek = (week: DateTime) => {
+		const currentWeek = currentDate.startOf("week");
+		return week.hasSame(currentWeek, "week");
+	};
+
 	return (
 		<div className="p-6 space-y-8">
 			<div>
@@ -107,7 +114,7 @@ export default function WeekSelector({ now }: WeekSelectorProps) {
 							key={year}
 							onClick={() => handleYearSelect(year)}
 							className={cn(
-								"p-4 text-center rounded-lg border transition-all duration-200",
+								"p-4 text-center rounded-lg border transition-all duration-200 relative",
 								"hover:border-blue-500 hover:bg-blue-500/10",
 								selectedYear === year
 									? "border-blue-500 bg-blue-500/20 font-medium"
@@ -115,6 +122,9 @@ export default function WeekSelector({ now }: WeekSelectorProps) {
 							)}
 						>
 							{year}
+							{isCurrentYear(year) && (
+								<span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500" />
+							)}
 						</button>
 					))}
 				</div>
@@ -130,7 +140,7 @@ export default function WeekSelector({ now }: WeekSelectorProps) {
 								key={month}
 								onClick={() => handleMonthSelect(month)}
 								className={cn(
-									"p-4 text-center rounded-lg border transition-all duration-200",
+									"p-4 text-center rounded-lg border transition-all duration-200 relative",
 									"hover:border-blue-500 hover:bg-blue-500/10",
 									selectedMonth === month
 										? "border-blue-500 bg-blue-500/20 font-medium"
@@ -138,6 +148,9 @@ export default function WeekSelector({ now }: WeekSelectorProps) {
 								)}
 							>
 								{DateTime.local(2024, month).toFormat("MMMM")}
+								{isCurrentMonth(month) && selectedYear === currentDate.year && (
+									<span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500" />
+								)}
 							</button>
 						))}
 					</div>
@@ -154,7 +167,7 @@ export default function WeekSelector({ now }: WeekSelectorProps) {
 								key={week.toISO()}
 								onClick={() => setSelectedWeek(week)}
 								className={cn(
-									"p-4 text-center rounded-lg border transition-all duration-200",
+									"p-4 text-center rounded-lg border transition-all duration-200 relative",
 									"hover:border-blue-500 hover:bg-blue-500/10",
 									selectedWeek?.toISO() === week.toISO()
 										? "border-blue-500 bg-blue-500/20 font-medium"
@@ -162,6 +175,11 @@ export default function WeekSelector({ now }: WeekSelectorProps) {
 								)}
 							>
 								{formatWeekRange(week)}
+								{isCurrentWeek(week) &&
+									selectedYear === currentDate.year &&
+									selectedMonth === currentDate.month && (
+										<span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500" />
+									)}
 							</button>
 						))}
 					</div>

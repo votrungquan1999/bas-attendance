@@ -10,9 +10,6 @@ export default async function BrowseWeekPage() {
 	return (
 		<div className="container mx-auto p-6">
 			<div className="bg-white rounded-lg shadow-md">
-				<div className="p-6 border-b">
-					<h2 className="text-2xl font-semibold">Browse Weekly Goals</h2>
-				</div>
 				<WeekSelector now={now} />
 			</div>
 		</div>
