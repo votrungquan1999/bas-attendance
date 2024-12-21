@@ -9,7 +9,6 @@ import {
 	type ActivitiesCollectionDocument,
 	ActivitiesCollectionName,
 } from "src/server/collections";
-import getDB from "src/server/db";
 import query_getEligibleAthletes from "src/app/admin/attendance/by-week/query_getEligibleAthletes";
 import { WEEKLY_GOALS } from "src/server/constants";
 import {
@@ -17,7 +16,9 @@ import {
 	unstable_cacheTag as cacheTag,
 } from "next/cache";
 import { DateTime } from "luxon";
+import { getMongoDB, injectMongoDB } from "../withMongoDB";
 
+// TODO: fix this to return athleteId instead of athleteName
 interface Achievement {
 	longestStreak: {
 		weeks: number;
@@ -130,14 +131,14 @@ function calculateStreak(
 	return maxStreak;
 }
 
-export default async function query_getAchievements(): Promise<Achievement> {
-	cacheLife("hours");
-	cacheTag("achievement_aggregation");
+export default injectMongoDB(
+	async function query_getAchievements(): Promise<Achievement> {
+		cacheLife("hours");
+		cacheTag("achievement_aggregation");
 
-	const { db, close } = await getDB();
+		const db = getMongoDB();
 
-	try {
-		const activitiesCollection = db.collection<ActivitiesCollection>(
+		const activitiesCollection = db.collection<ActivitiesCollectionDocument>(
 			ActivitiesCollectionName,
 		);
 
@@ -263,7 +264,5 @@ export default async function query_getAchievements(): Promise<Achievement> {
 					weeks: stat.runningStreak,
 				})),
 		};
-	} finally {
-		await close();
-	}
-}
+	},
+);
