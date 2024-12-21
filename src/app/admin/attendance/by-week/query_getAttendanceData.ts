@@ -2,7 +2,7 @@ import { groupBy } from "lodash/fp";
 import type { CompletedActivity } from "src/server/types";
 import type { WeekRange } from "src/helpers/weekRange";
 import {
-	type ActivitiesCollection,
+	type ActivitiesCollectionDocument,
 	ActivitiesCollectionName,
 } from "src/server/collections";
 import getDB from "src/server/db";
@@ -17,7 +17,7 @@ export default async function query_getAttendanceData(
 ): Promise<AttendanceData[]> {
 	const { db, close } = await getDB();
 
-	const activitiesCollection = db.collection<ActivitiesCollection>(
+	const activitiesCollection = db.collection<ActivitiesCollectionDocument>(
 		ActivitiesCollectionName,
 	);
 

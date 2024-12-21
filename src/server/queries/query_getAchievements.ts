@@ -6,7 +6,7 @@ import type {
 	CompletedActivity,
 } from "src/server/types";
 import {
-	type ActivitiesCollection,
+	type ActivitiesCollectionDocument,
 	ActivitiesCollectionName,
 } from "src/server/collections";
 import getDB from "src/server/db";
