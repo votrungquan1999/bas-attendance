@@ -218,14 +218,17 @@ export default injectMongoDB(
 		const topRunning = [...athleteStats].sort(
 			(a, b) => b.runningStreak - a.runningStreak,
 		);
-		const bestRunner = athleteStats.reduce((best, current) => {
-			if (!current.bestPerformance) return best;
-			if (!best?.bestPerformance) return current;
-			return current.bestPerformance.minutesPerLap <
-				best.bestPerformance.minutesPerLap
-				? current
-				: best;
-		});
+		const bestRunner = athleteStats.reduce(
+			(best, current) => {
+				if (!current.bestPerformance) return best;
+				if (!best?.bestPerformance) return current;
+				return current.bestPerformance.minutesPerLap <
+					best.bestPerformance.minutesPerLap
+					? current
+					: best;
+			},
+			undefined as (typeof athleteStats)[number] | undefined,
+		);
 
 		return {
 			longestStreak: {
