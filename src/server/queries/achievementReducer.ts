@@ -1,5 +1,8 @@
-import type { CompletedActivity, CompletedEnduranceRun } from "../types";
-import { WEEKLY_GOALS } from "../constants";
+import type {
+	CompletedActivity,
+	CompletedEnduranceRun,
+	WeeklyGoals,
+} from "../types";
 import { DateTime } from "luxon";
 
 export interface WeeklyProgress {
@@ -13,6 +16,10 @@ export interface WeekCompletion {
 	weekKey: string;
 	isAttendanceCompleted: boolean;
 	isRunningCompleted: boolean;
+}
+
+export interface WeeklyGoalsMap {
+	[weekKey: string]: WeeklyGoals;
 }
 
 export interface AchievementState {
@@ -39,17 +46,44 @@ function getWeekKey(timestamp: number): string {
 	return `${dt.year}-${dt.weekNumber}`;
 }
 
-function isWeekCompleted(activities: WeeklyProgress): boolean {
+function hasThirtyMinGoals(goals: WeeklyGoals): boolean {
 	return (
-		activities.personalTechnique >= WEEKLY_GOALS.thirtyMin.personalTechnique &&
-		activities.probabilityPractice >=
-			WEEKLY_GOALS.thirtyMin.probabilityPractice &&
-		activities.buddyTraining >= WEEKLY_GOALS.thirtyMin.buddyTraining
+		goals.thirtyMin.personalTechnique > 0 ||
+		goals.thirtyMin.probabilityPractice > 0 ||
+		goals.thirtyMin.buddyTraining > 0
 	);
 }
 
-function isRunningWeekCompleted(activities: WeeklyProgress): boolean {
-	return activities.enduranceRun >= WEEKLY_GOALS.enduranceRun;
+function hasRunningGoals(goals: WeeklyGoals): boolean {
+	return goals.enduranceRun > 0;
+}
+
+function isWeekCompleted(
+	activities: WeeklyProgress,
+	goals: WeeklyGoals,
+): boolean {
+	// If there are no thirty-minute goals, consider it not completed
+	if (!hasThirtyMinGoals(goals)) {
+		return false;
+	}
+
+	return (
+		activities.personalTechnique >= goals.thirtyMin.personalTechnique &&
+		activities.probabilityPractice >= goals.thirtyMin.probabilityPractice &&
+		activities.buddyTraining >= goals.thirtyMin.buddyTraining
+	);
+}
+
+function isRunningWeekCompleted(
+	activities: WeeklyProgress,
+	goals: WeeklyGoals,
+): boolean {
+	// If there are no running goals, consider it not completed
+	if (!hasRunningGoals(goals)) {
+		return false;
+	}
+
+	return activities.enduranceRun >= goals.enduranceRun;
 }
 
 function updateStreaks(
@@ -57,20 +91,32 @@ function updateStreaks(
 	weekKey: string,
 	isAttendanceCompleted: boolean,
 	isRunningCompleted: boolean,
+	currentWeekGoals: WeeklyGoals,
+	previousWeekGoals?: WeeklyGoals,
 ): AchievementState["streaks"] {
 	// Calculate attendance streak
 	let currentAttendanceStreak = state.streaks.currentAttendanceStreak;
-	if (isAttendanceCompleted) {
+	const hasAttendanceGoals = hasThirtyMinGoals(currentWeekGoals);
+	const hadAttendanceGoals = previousWeekGoals
+		? hasThirtyMinGoals(previousWeekGoals)
+		: true;
+
+	if (isAttendanceCompleted && hasAttendanceGoals) {
 		currentAttendanceStreak = state.streaks.currentAttendanceStreak + 1;
-	} else {
+	} else if (hadAttendanceGoals && !isAttendanceCompleted) {
 		currentAttendanceStreak = 0;
 	}
 
 	// Calculate running streak
 	let currentRunningStreak = state.streaks.currentRunningStreak;
-	if (isRunningCompleted) {
+	const hasCurrentRunningGoals = hasRunningGoals(currentWeekGoals);
+	const hadPreviousRunningGoals = previousWeekGoals
+		? hasRunningGoals(previousWeekGoals)
+		: true;
+
+	if (isRunningCompleted && hasCurrentRunningGoals) {
 		currentRunningStreak = state.streaks.currentRunningStreak + 1;
-	} else {
+	} else if (hadPreviousRunningGoals && !isRunningCompleted) {
 		currentRunningStreak = 0;
 	}
 
@@ -85,28 +131,43 @@ function updateStreaks(
 			currentRunningStreak,
 			state.streaks.bestRunningStreak,
 		),
-		lastAttendanceStreakWeek: isAttendanceCompleted
-			? weekKey
-			: state.streaks.lastAttendanceStreakWeek,
-		lastRunningStreakWeek: isRunningCompleted
-			? weekKey
-			: state.streaks.lastRunningStreakWeek,
+		lastAttendanceStreakWeek:
+			isAttendanceCompleted && hasAttendanceGoals
+				? weekKey
+				: state.streaks.lastAttendanceStreakWeek,
+		lastRunningStreakWeek:
+			isRunningCompleted && hasCurrentRunningGoals
+				? weekKey
+				: state.streaks.lastRunningStreakWeek,
 	};
 }
 
 export function achievementReducer(
 	state: AchievementState,
 	activity: CompletedActivity,
+	goalsMap: WeeklyGoalsMap,
 ): AchievementState {
 	const weekKey = getWeekKey(activity.activityTimestamp);
+	const currentWeekGoals = goalsMap[weekKey];
+
+	if (!currentWeekGoals) {
+		throw new Error(`No goals found for week ${weekKey}`);
+	}
 
 	// Handle week transition
-	if (weekKey !== state.currentWeek) {
+	if (weekKey !== state.currentWeek && state.currentWeek) {
+		const previousWeekGoals = goalsMap[state.currentWeek];
+		if (!previousWeekGoals) {
+			throw new Error(`No goals found for previous week ${state.currentWeek}`);
+		}
+
 		const wasLastWeekAttendanceCompleted = isWeekCompleted(
 			state.weeklyActivities,
+			previousWeekGoals,
 		);
 		const wasLastWeekRunningCompleted = isRunningWeekCompleted(
 			state.weeklyActivities,
+			previousWeekGoals,
 		);
 
 		return achievementReducer(
@@ -124,9 +185,12 @@ export function achievementReducer(
 					weekKey,
 					wasLastWeekAttendanceCompleted,
 					wasLastWeekRunningCompleted,
+					currentWeekGoals,
+					previousWeekGoals,
 				),
 			},
 			activity,
+			goalsMap,
 		);
 	}
 
@@ -143,6 +207,7 @@ export function achievementReducer(
 
 		const newState = {
 			...state,
+			currentWeek: weekKey,
 			weeklyActivities,
 		};
 
@@ -163,7 +228,10 @@ export function achievementReducer(
 		}
 
 		// Check if this activity completes the running goal
-		const isRunningCompleted = isRunningWeekCompleted(weeklyActivities);
+		const isRunningCompleted = isRunningWeekCompleted(
+			weeklyActivities,
+			currentWeekGoals,
+		);
 		if (isRunningCompleted) {
 			newState.streaks = {
 				...state.streaks,
@@ -203,31 +271,30 @@ export function achievementReducer(
 
 		const newState = {
 			...state,
+			currentWeek: weekKey,
 			weeklyActivities,
 		};
 
 		// Check if this activity completes the attendance goal
-		const isAttendanceCompleted = isWeekCompleted(weeklyActivities);
+		const isAttendanceCompleted = isWeekCompleted(
+			weeklyActivities,
+			currentWeekGoals,
+		);
 		if (isAttendanceCompleted) {
-			newState.streaks = {
-				...state.streaks,
-				currentAttendanceStreak:
-					state.streaks.lastAttendanceStreakWeek === weekKey
-						? state.streaks.currentAttendanceStreak
-						: state.streaks.currentAttendanceStreak + 1,
-				bestAttendanceStreak: Math.max(
-					state.streaks.currentAttendanceStreak + 1,
-					state.streaks.bestAttendanceStreak,
-				),
-				lastAttendanceStreakWeek: weekKey,
-				currentRunningStreak: state.streaks.currentRunningStreak,
-				bestRunningStreak: state.streaks.bestRunningStreak,
-				lastRunningStreakWeek: state.streaks.lastRunningStreakWeek,
-			};
+			newState.streaks = updateStreaks(
+				state,
+				weekKey,
+				true,
+				false,
+				currentWeekGoals,
+			);
 		}
 
 		return newState;
 	}
 
-	return state;
+	return {
+		...state,
+		currentWeek: weekKey,
+	};
 }
