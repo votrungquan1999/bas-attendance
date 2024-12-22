@@ -36,6 +36,7 @@ export interface AchievementState {
 		minutes: number;
 		timestamp: number;
 	};
+	lastActivityId: string | null;
 }
 
 export class NoGoalsFoundError extends Error {
@@ -166,6 +167,7 @@ export function achievementReducer(
 
 	// Initialize new state for current week activity
 	const newState = cloneDeep(state);
+	newState.lastActivityId = activity.id;
 
 	// Handle endurance run activity
 	if (activity.activity === "endurance-run") {

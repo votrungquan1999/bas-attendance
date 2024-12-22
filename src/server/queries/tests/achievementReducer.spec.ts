@@ -59,6 +59,7 @@ describe("achievementReducer", () => {
 			minutes: 0,
 			timestamp: 0,
 		},
+		lastActivityId: null,
 	};
 
 	function getTimestampForWeek(year: number, week: number): number {
@@ -172,6 +173,7 @@ describe("achievementReducer", () => {
 				minutes: 0,
 				timestamp: 0,
 			},
+			lastActivityId: "test-30min-1",
 		});
 	});
 
@@ -1339,5 +1341,82 @@ describe("achievementReducer", () => {
 
 		// Week should be updated to week 13
 		expect(stateAfterWeek13.currentWeek).toBe("2024-13");
+	});
+
+	test("should update lastActivityId with each activity", () => {
+		const week10Timestamp = getTimestampForWeek(2024, 10);
+		const state = initialState;
+
+		// First activity
+		const firstActivity: CompletedEnduranceRun = {
+			id: "test-run-1",
+			activity: "endurance-run",
+			activityTimestamp: week10Timestamp,
+			attendanceId: "test-id",
+			laps: "8",
+			minutes: "48",
+			submittedAt: week10Timestamp,
+		};
+
+		const stateAfterFirstActivity = achievementReducer(
+			state,
+			firstActivity,
+			goalsMap,
+		);
+		expect(stateAfterFirstActivity.lastActivityId).toBe("test-run-1");
+
+		// Second activity
+		const secondActivity: CompletedThirtyMinActivity = {
+			id: "test-30min-1",
+			activity: "30-minutes-session",
+			activityTimestamp: week10Timestamp,
+			attendanceId: "test-id",
+			thirtyMinActivity: "personal-technique",
+			thirtyMinExplanation: "test explanation",
+			submittedAt: week10Timestamp,
+		};
+
+		const stateAfterSecondActivity = achievementReducer(
+			stateAfterFirstActivity,
+			secondActivity,
+			goalsMap,
+		);
+		expect(stateAfterSecondActivity.lastActivityId).toBe("test-30min-1");
+
+		// Normal session activity
+		const thirdActivity: CompletedStandardSession = {
+			id: "test-normal-1",
+			activity: "normal-long-session",
+			activityTimestamp: week10Timestamp,
+			attendanceId: "test-id",
+			submittedAt: week10Timestamp,
+			sessionType: "train-with-coach",
+		};
+
+		const stateAfterThirdActivity = achievementReducer(
+			stateAfterSecondActivity,
+			thirdActivity,
+			goalsMap,
+		);
+		expect(stateAfterThirdActivity.lastActivityId).toBe("test-normal-1");
+
+		// Week transition should preserve the last activity ID
+		const week11Timestamp = getTimestampForWeek(2024, 11);
+		const fourthActivity: CompletedEnduranceRun = {
+			id: "test-run-2",
+			activity: "endurance-run",
+			activityTimestamp: week11Timestamp,
+			attendanceId: "test-id",
+			laps: "8",
+			minutes: "48",
+			submittedAt: week11Timestamp,
+		};
+
+		const stateAfterFourthActivity = achievementReducer(
+			stateAfterThirdActivity,
+			fourthActivity,
+			goalsMap,
+		);
+		expect(stateAfterFourthActivity.lastActivityId).toBe("test-run-2");
 	});
 });
