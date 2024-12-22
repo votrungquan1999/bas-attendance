@@ -38,6 +38,15 @@ export interface AchievementState {
 	};
 }
 
+export class NoGoalsFoundError extends Error {
+	weekKey: string;
+
+	constructor(weekKey: string) {
+		super(`No goals found for week ${weekKey}`);
+		this.weekKey = weekKey;
+	}
+}
+
 function getWeekKey(timestamp: number): string {
 	const dt = DateTime.fromMillis(timestamp, { zone: "Asia/Saigon" });
 	return `${dt.year}-${dt.weekNumber}`;
@@ -102,13 +111,20 @@ function handleWeekTransition(
 	const newState = cloneDeep(state);
 	const prevWeekGoals = goalsMap[state.currentWeek];
 
-	// if the previous week does not meet the goals, reset the streaks
-	if (!isWeekCompleted(state.weeklyActivities, prevWeekGoals)) {
+	// if the previous week has thirty-minute goals and does not meet them, reset the attendance streak
+	if (
+		hasThirtyMinGoals(prevWeekGoals) &&
+		!isWeekCompleted(state.weeklyActivities, prevWeekGoals)
+	) {
 		newState.streaks.currentAttendanceStreak = 0;
 		newState.streaks.lastAttendanceStreakWeek = null;
 	}
 
-	if (!isRunningWeekCompleted(state.weeklyActivities, prevWeekGoals)) {
+	// if the previous week has running goals and does not meet them, reset the running streak
+	if (
+		hasRunningGoals(prevWeekGoals) &&
+		!isRunningWeekCompleted(state.weeklyActivities, prevWeekGoals)
+	) {
 		newState.streaks.currentRunningStreak = 0;
 		newState.streaks.lastRunningStreakWeek = null;
 	}
@@ -136,7 +152,7 @@ export function achievementReducer(
 	const goals = goalsMap[weekKey];
 
 	if (!goals) {
-		throw new Error(`No goals found for week ${weekKey}`);
+		throw new NoGoalsFoundError(weekKey);
 	}
 
 	if (state.currentWeek === "") {
@@ -174,6 +190,11 @@ export function achievementReducer(
 			};
 		}
 
+		// if the week has no running goals, don't update the streak
+		if (!hasRunningGoals(goals)) {
+			return newState;
+		}
+
 		// Check if this activity completes the running goals
 		if (isRunningWeekCompleted(newState.weeklyActivities, goals)) {
 			// Only update streak if we haven't already counted this week
@@ -199,6 +220,11 @@ export function achievementReducer(
 			case "probability-practice":
 				newState.weeklyActivities.probabilityPractice++;
 				break;
+		}
+
+		// if the week has no thirty-minute goals, don't update the streak
+		if (!hasThirtyMinGoals(goals)) {
+			return newState;
 		}
 
 		// Check if this activity completes the week's goals
