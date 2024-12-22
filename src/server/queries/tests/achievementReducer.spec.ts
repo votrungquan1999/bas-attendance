@@ -8,7 +8,9 @@ import type {
 	CompletedEnduranceRun,
 	CompletedThirtyMinActivity,
 	CompletedStandardSession,
+	CompletedActivity,
 	WeeklyGoals,
+	CompletedProbabilityPractice,
 } from "src/server/types";
 import { DateTime } from "luxon";
 
@@ -66,6 +68,8 @@ describe("achievementReducer", () => {
 
 	test("should handle endurance run activity", () => {
 		const timestamp = getTimestampForWeek(2024, 10);
+		const state = initialState;
+
 		const activity: CompletedEnduranceRun = {
 			id: "test-run-1",
 			activity: "endurance-run",
@@ -76,7 +80,7 @@ describe("achievementReducer", () => {
 			submittedAt: timestamp,
 		};
 
-		const newState = achievementReducer(initialState, activity, goalsMap);
+		const newState = achievementReducer(state, activity, goalsMap);
 
 		expect(newState.weeklyActivities.enduranceRun).toBe(1);
 		expect(newState.bestRun).toEqual({
@@ -90,33 +94,48 @@ describe("achievementReducer", () => {
 
 	test("should update best run only when better", () => {
 		const timestamp = getTimestampForWeek(2024, 10);
-		const state: AchievementState = {
-			...initialState,
-			currentWeek: "2024-10",
-			bestRun: {
-				minutesPerLap: 7, // worse performance
-				laps: 6,
-				minutes: 42,
-				timestamp: timestamp - 1000,
-			},
+		const state = initialState;
+
+		// First activity - worse performance
+		const firstActivity: CompletedEnduranceRun = {
+			id: "test-run-2a",
+			activity: "endurance-run",
+			activityTimestamp: timestamp - 1000,
+			attendanceId: "test-id",
+			laps: "6",
+			minutes: "42", // 7 min per lap
+			submittedAt: timestamp - 1000,
 		};
 
-		const activity: CompletedEnduranceRun = {
-			id: "test-run-2",
+		// Second activity - better performance
+		const secondActivity: CompletedEnduranceRun = {
+			id: "test-run-2b",
 			activity: "endurance-run",
 			activityTimestamp: timestamp,
 			attendanceId: "test-id",
 			laps: "8",
-			minutes: "48", // 6 min per lap - better performance
+			minutes: "48", // 6 min per lap
 			submittedAt: timestamp,
 		};
 
-		const newState = achievementReducer(state, activity, goalsMap);
+		const intermediateState = achievementReducer(
+			state,
+			firstActivity,
+			goalsMap,
+		);
+		const newState = achievementReducer(
+			intermediateState,
+			secondActivity,
+			goalsMap,
+		);
+
 		expect(newState.bestRun.minutesPerLap).toBe(6);
 	});
 
 	test("should handle 30-minute session activities", () => {
 		const timestamp = getTimestampForWeek(2024, 10);
+		const state = initialState;
+
 		const activity: CompletedThirtyMinActivity = {
 			id: "test-30min-1",
 			activity: "30-minutes-session",
@@ -127,127 +146,139 @@ describe("achievementReducer", () => {
 			submittedAt: timestamp,
 		};
 
-		const newState = achievementReducer(initialState, activity, goalsMap);
-		expect(newState.weeklyActivities.personalTechnique).toBe(1);
-		expect(newState.currentWeek).toBe("2024-10");
-	});
-
-	test("should reset weekly activities when week changes", () => {
-		const state: AchievementState = {
-			...initialState,
+		const newState = achievementReducer(state, activity, goalsMap);
+		// assert whole state
+		expect(newState).toEqual({
 			currentWeek: "2024-10",
 			weeklyActivities: {
-				enduranceRun: 2, // met running goal
-				personalTechnique: 2, // met personal technique goal
-				probabilityPractice: 1, // met probability practice goal
-				buddyTraining: 1, // met buddy training goal
-			},
-		};
-
-		const week11Timestamp = getTimestampForWeek(2024, 11);
-		const activity: CompletedThirtyMinActivity = {
-			id: "test-30min-2",
-			activity: "30-minutes-session",
-			activityTimestamp: week11Timestamp,
-			attendanceId: "test-id",
-			thirtyMinActivity: "personal-technique",
-			thirtyMinExplanation: "test explanation",
-			submittedAt: week11Timestamp,
-		};
-
-		const newState = achievementReducer(state, activity, goalsMap);
-
-		expect(newState.currentWeek).toBe("2024-11");
-		expect(newState.weeklyActivities).toEqual({
 			enduranceRun: 0,
 			personalTechnique: 1,
 			probabilityPractice: 0,
 			buddyTraining: 0,
+			},
+			streaks: {
+				currentAttendanceStreak: 0,
+				currentRunningStreak: 0,
+				bestAttendanceStreak: 0,
+				bestRunningStreak: 0,
+				lastAttendanceStreakWeek: null,
+				lastRunningStreakWeek: null,
+			},
+			bestRun: {
+				minutesPerLap: 0,
+				laps: 0,
+				minutes: 0,
+				timestamp: 0,
+			},
 		});
 	});
 
-	test("should update attendance streak independently when completing attendance goal", () => {
-		const timestamp = getTimestampForWeek(2024, 10);
-		const state: AchievementState = {
-			...initialState,
-			currentWeek: "2024-10",
-			weeklyActivities: {
-				enduranceRun: 1, // running goal not met (needs 2)
-				personalTechnique: 2, // met
-				probabilityPractice: 1, // met
-				buddyTraining: 0, // needs 1 more
-			},
-			streaks: {
-				currentAttendanceStreak: 1,
-				bestAttendanceStreak: 1,
-				currentRunningStreak: 0, // running streak is 0 because previous week didn't meet running goal
-				bestRunningStreak: 1,
-				lastAttendanceStreakWeek: "2024-9",
-				lastRunningStreakWeek: null,
-			},
-		};
+	test("should increase the attendance streak when the goals are met", () => {
+		const week10Timestamp = getTimestampForWeek(2024, 10);
+		const state = initialState;
 
-		// This activity will complete the attendance goal
-		const activity: CompletedThirtyMinActivity = {
-			id: "test-30min-3",
+		// Setup activities for week 10
+		const week10Activities: CompletedActivity[] = [
+			{
+				id: "test-run-3a",
+				activity: "endurance-run",
+				activityTimestamp: week10Timestamp,
+				attendanceId: "test-id",
+				laps: "8",
+				minutes: "48",
+				submittedAt: week10Timestamp,
+			},
+			{
+				id: "test-30min-2a",
 			activity: "30-minutes-session",
-			activityTimestamp: timestamp,
+				activityTimestamp: week10Timestamp,
+				attendanceId: "test-id",
+				thirtyMinActivity: "personal-technique",
+				thirtyMinExplanation: "test explanation",
+				submittedAt: week10Timestamp,
+			},
+			{
+				id: "test-30min-2b",
+				activity: "30-minutes-session",
+				activityTimestamp: week10Timestamp,
+				attendanceId: "test-id",
+				thirtyMinActivity: "personal-technique",
+				thirtyMinExplanation: "test explanation",
+				submittedAt: week10Timestamp,
+			},
+			{
+				id: "test-30min-2c",
+				activity: "30-minutes-session",
+				activityTimestamp: week10Timestamp,
+				attendanceId: "test-id",
+				thirtyMinActivity: "probability-practice",
+				practiceType: "layup",
+				practiceLevel: "1",
+				practiceDescription: "test practice",
+				submittedAt: week10Timestamp,
+			} as CompletedProbabilityPractice,
+			{
+				id: "test-30min-2d",
+				activity: "30-minutes-session",
+				activityTimestamp: week10Timestamp,
 			attendanceId: "test-id",
 			thirtyMinActivity: "buddy-training",
-			thirtyMinExplanation: "completing attendance goal",
-			submittedAt: timestamp,
-		};
+				thirtyMinExplanation: "test explanation",
+				submittedAt: week10Timestamp,
+			},
+		];
 
-		const newState = achievementReducer(state, activity, goalsMap);
+		// Apply all week 10 activities
+		const stateAfterWeek10 = week10Activities.reduce(
+			(currentState, activity) =>
+				achievementReducer(currentState, activity, goalsMap),
+			state,
+		);
 
-		// Attendance streak should increase while running streak remains at 0
-		expect(newState.weeklyActivities.buddyTraining).toBe(1);
-		expect(newState.streaks.currentAttendanceStreak).toBe(2); // increased because attendance goal was met
-		expect(newState.streaks.currentRunningStreak).toBe(0); // remains 0 because running goal is still not met
-		expect(newState.streaks.lastAttendanceStreakWeek).toBe("2024-10");
-		expect(newState.streaks.lastRunningStreakWeek).toBe(null); // unchanged because running goal not met
+		// Verify state after week 10 activities - streak is 1 because week 10 goals are met
+		expect(stateAfterWeek10.streaks.currentAttendanceStreak).toBe(1);
+		// streak is 0 because running goal is not met
+		expect(stateAfterWeek10.streaks.currentRunningStreak).toBe(0);
+		expect(stateAfterWeek10.streaks.lastAttendanceStreakWeek).toBe("2024-10");
 	});
 
-	test("should update running streak independently when completing running goal", () => {
-		const timestamp = getTimestampForWeek(2024, 10);
-		const state: AchievementState = {
-			...initialState,
-			currentWeek: "2024-10",
-			weeklyActivities: {
-				enduranceRun: 1, // needs 1 more
-				personalTechnique: 1, // attendance goal not met (needs 2)
-				probabilityPractice: 1, // met
-				buddyTraining: 1, // met
-			},
-			streaks: {
-				currentAttendanceStreak: 0, // attendance streak already broken
-				bestAttendanceStreak: 1,
-				currentRunningStreak: 1,
-				bestRunningStreak: 1,
-				lastAttendanceStreakWeek: null,
-				lastRunningStreakWeek: "2024-9",
-			},
-		};
+	test("should increase running streak when the goals are met", () => {
+		const week9Timestamp = getTimestampForWeek(2024, 9);
+		const state = initialState;
 
-		// This activity will complete the running goal
-		const activity: CompletedEnduranceRun = {
-			id: "test-run-3",
+		// Setup activities for week 9 to establish streak
+		const week9Activities: CompletedActivity[] = [
+			{
+				id: "test-run-3e",
 			activity: "endurance-run",
-			activityTimestamp: timestamp,
+				activityTimestamp: week9Timestamp,
 			attendanceId: "test-id",
 			laps: "6",
 			minutes: "42",
-			submittedAt: timestamp,
-		};
+				submittedAt: week9Timestamp,
+			},
+			{
+				id: "test-run-3f",
+				activity: "endurance-run",
+				activityTimestamp: week9Timestamp,
+				attendanceId: "test-id",
+				laps: "6",
+				minutes: "42",
+				submittedAt: week9Timestamp,
+			},
+		];
 
-		const newState = achievementReducer(state, activity, goalsMap);
+		// Apply all week 9 activities first
+		const stateAfterWeek9 = week9Activities.reduce(
+			(currentState, activity) =>
+				achievementReducer(currentState, activity, goalsMap),
+			state,
+		);
 
-		// Running streak should increase while attendance streak remains at 0
-		expect(newState.weeklyActivities.enduranceRun).toBe(2);
-		expect(newState.streaks.currentRunningStreak).toBe(2); // increased
-		expect(newState.streaks.currentAttendanceStreak).toBe(0); // unchanged
-		expect(newState.streaks.lastRunningStreakWeek).toBe("2024-10");
-		expect(newState.streaks.lastAttendanceStreakWeek).toBe(null); // unchanged
+		// assert that attendance streak is 1 since it meets the goal
+		expect(stateAfterWeek9.streaks.currentRunningStreak).toBe(1);
+		expect(stateAfterWeek9.streaks.lastRunningStreakWeek).toBe("2024-9");
+		expect(stateAfterWeek9.currentWeek).toBe("2024-9");
 	});
 
 	test("should break streaks independently when goals are not met", () => {
