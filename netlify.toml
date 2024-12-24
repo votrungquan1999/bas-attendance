@@ -1,5 +1,5 @@
 [build]
-command = "bun run build"
+command = "rm -rf tests && bun run build"
 
 # Exclude tests directory from deployment
 [build.processing.files]
