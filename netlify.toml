@@ -1,0 +1,6 @@
+[build]
+command = "bun run build"
+
+# Exclude tests directory from deployment
+[build.processing.files]
+exclude = ["tests/**/*"]
