@@ -4,7 +4,10 @@
 
 import { describe, it, expect, mock, afterAll } from "bun:test";
 import query_getAchievements from "../query_getAchievements";
-import type { ActivitiesCollectionDocument } from "src/server/collections";
+import {
+	type ActivitiesCollectionDocument,
+	ActivitiesCollectionName,
+} from "src/server/collections";
 import withTestContext, { cleanUp } from "src/helpers/withTestContext";
 import { getMongoDB } from "src/server/withMongoDB";
 
@@ -90,8 +93,9 @@ describe("query_getAchievements", () => {
 		"should calculate achievements with basic sample data",
 		withTestContext(async () => {
 			const db = getMongoDB();
-			const activitiesCollection =
-				db.collection<ActivitiesCollectionDocument>("activities");
+			const activitiesCollection = db.collection<ActivitiesCollectionDocument>(
+				ActivitiesCollectionName,
+			);
 
 			const sampleData = [
 				// Personal Technique (2 required)
@@ -177,8 +181,9 @@ describe("query_getAchievements", () => {
 		"should handle multiple athletes with different achievements",
 		withTestContext(async () => {
 			const db = getMongoDB();
-			const activitiesCollection =
-				db.collection<ActivitiesCollectionDocument>("activities");
+			const activitiesCollection = db.collection<ActivitiesCollectionDocument>(
+				ActivitiesCollectionName,
+			);
 
 			const now = Date.now();
 			const oneWeek = 7 * 24 * 60 * 60 * 1000;
@@ -275,8 +280,9 @@ describe("query_getAchievements", () => {
 		"should handle multiple athletes with different running performances",
 		withTestContext(async () => {
 			const db = getMongoDB();
-			const activitiesCollection =
-				db.collection<ActivitiesCollectionDocument>("activities");
+			const activitiesCollection = db.collection<ActivitiesCollectionDocument>(
+				ActivitiesCollectionName,
+			);
 
 			const now = Date.now();
 			const activities = [
@@ -323,8 +329,9 @@ describe("query_getAchievements", () => {
 		"should handle multiple athletes with overlapping streaks",
 		withTestContext(async () => {
 			const db = getMongoDB();
-			const activitiesCollection =
-				db.collection<ActivitiesCollectionDocument>("activities");
+			const activitiesCollection = db.collection<ActivitiesCollectionDocument>(
+				ActivitiesCollectionName,
+			);
 
 			const now = Date.now();
 			const oneWeek = 7 * 24 * 60 * 60 * 1000;
@@ -396,8 +403,9 @@ describe("query_getAchievements", () => {
 		"should handle multiple athletes with different activity types",
 		withTestContext(async () => {
 			const db = getMongoDB();
-			const activitiesCollection =
-				db.collection<ActivitiesCollectionDocument>("activities");
+			const activitiesCollection = db.collection<ActivitiesCollectionDocument>(
+				ActivitiesCollectionName,
+			);
 
 			const now = Date.now();
 

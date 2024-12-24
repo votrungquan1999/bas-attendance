@@ -6,6 +6,8 @@ import {
 	type WeekId,
 	type AchievementCollectionDocument,
 	WeeklyGoalsCollectionName,
+	ActivitiesCollectionName,
+	AchievementsCollectionName,
 } from "src/server/collections";
 import withTestContext, { cleanUp } from "src/helpers/withTestContext";
 import { getMongoDB } from "src/server/withMongoDB";
@@ -48,7 +50,7 @@ describe("query_getAchievementForAthlete", () => {
 	) {
 		const db = getMongoDB();
 		await db
-			.collection<WeeklyGoalsCollectionDocument>("weekly_goals")
+			.collection<WeeklyGoalsCollectionDocument>(WeeklyGoalsCollectionName)
 			.insertOne({
 				id: nanoid(),
 				weekId,
@@ -66,7 +68,7 @@ describe("query_getAchievementForAthlete", () => {
 		// get last activity id
 		const db = getMongoDB();
 		const lastActivity = await db
-			.collection<ActivitiesCollectionDocument>("activities")
+			.collection<ActivitiesCollectionDocument>(ActivitiesCollectionName)
 			.findOne(
 				{
 					attendanceId: athleteId,
@@ -151,7 +153,7 @@ describe("query_getAchievementForAthlete", () => {
 		] as const;
 
 		await db
-			.collection<ActivitiesCollectionDocument>("activities")
+			.collection<ActivitiesCollectionDocument>(ActivitiesCollectionName)
 			.insertMany(activities);
 	};
 
@@ -160,7 +162,9 @@ describe("query_getAchievementForAthlete", () => {
 		withTestContext(async () => {
 			const db = getMongoDB();
 			const achievementsCollection =
-				db.collection<AchievementCollectionDocument>("achievements");
+				db.collection<AchievementCollectionDocument>(
+					AchievementsCollectionName,
+				);
 
 			const timestamp = Date.now() - 7 * 24 * 60 * 60 * 1000;
 			const weekId =
@@ -192,7 +196,9 @@ describe("query_getAchievementForAthlete", () => {
 		withTestContext(async () => {
 			const db = getMongoDB();
 			const achievementsCollection =
-				db.collection<AchievementCollectionDocument>("achievements");
+				db.collection<AchievementCollectionDocument>(
+					AchievementsCollectionName,
+				);
 
 			const timestamp = Date.now() - 7 * 24 * 60 * 60 * 1000;
 			const dt = DateTime.fromMillis(timestamp, { zone: "Asia/Saigon" });
@@ -275,7 +281,7 @@ describe("query_getAchievementForAthlete", () => {
 			// delete the activities for the week 1, except for the last activity
 			const db = getMongoDB();
 			await db
-				.collection<ActivitiesCollectionDocument>("activities")
+				.collection<ActivitiesCollectionDocument>(ActivitiesCollectionName)
 				.deleteMany({
 					attendanceId: "athlete1",
 					id: { $lt: "6" },
@@ -370,8 +376,9 @@ describe("query_getAchievementForAthlete", () => {
 		"should handle incomplete activity sets correctly",
 		withTestContext(async () => {
 			const db = getMongoDB();
-			const activitiesCollection =
-				db.collection<ActivitiesCollectionDocument>("activities");
+			const activitiesCollection = db.collection<ActivitiesCollectionDocument>(
+				ActivitiesCollectionName,
+			);
 
 			const timestamp = Date.now();
 			const oneHour = 60 * 60 * 1000;
