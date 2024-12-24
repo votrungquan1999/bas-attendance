@@ -1419,4 +1419,121 @@ describe("achievementReducer", () => {
 		);
 		expect(stateAfterFourthActivity.lastActivityId).toBe("test-run-2");
 	});
+
+	test("should check the weekly goals in between if the new activity is not consecutive with the current week", () => {
+		const week8Timestamp = getTimestampForWeek(2024, 8);
+		const week11Timestamp = getTimestampForWeek(2024, 11);
+		const state = initialState;
+
+		// Setup activities for week 8 - meeting all goals
+		const week8Activities: CompletedActivity[] = [
+			{
+				id: "test-run-8a",
+				activity: "endurance-run",
+				activityTimestamp: week8Timestamp,
+				attendanceId: "test-id",
+				laps: "8",
+				minutes: "48",
+				submittedAt: week8Timestamp,
+			},
+			{
+				id: "test-run-8b",
+				activity: "endurance-run",
+				activityTimestamp: week8Timestamp,
+				attendanceId: "test-id",
+				laps: "8",
+				minutes: "48",
+				submittedAt: week8Timestamp,
+			},
+			{
+				id: "test-30min-8a",
+				activity: "30-minutes-session",
+				activityTimestamp: week8Timestamp,
+				attendanceId: "test-id",
+				thirtyMinActivity: "personal-technique",
+				thirtyMinExplanation: "test explanation",
+				submittedAt: week8Timestamp,
+			},
+			{
+				id: "test-30min-8b",
+				activity: "30-minutes-session",
+				activityTimestamp: week8Timestamp,
+				attendanceId: "test-id",
+				thirtyMinActivity: "personal-technique",
+				thirtyMinExplanation: "test explanation",
+				submittedAt: week8Timestamp,
+			},
+			{
+				id: "test-30min-8c",
+				activity: "30-minutes-session",
+				activityTimestamp: week8Timestamp,
+				attendanceId: "test-id",
+				thirtyMinActivity: "probability-practice",
+				practiceType: "layup",
+				practiceLevel: "1",
+				practiceDescription: "test practice",
+				submittedAt: week8Timestamp,
+			} as CompletedProbabilityPractice,
+			{
+				id: "test-30min-8d",
+				activity: "30-minutes-session",
+				activityTimestamp: week8Timestamp,
+				attendanceId: "test-id",
+				thirtyMinActivity: "buddy-training",
+				thirtyMinExplanation: "test explanation",
+				submittedAt: week8Timestamp,
+			},
+		];
+
+		// Apply week 8 activities
+		const stateAfterWeek8 = week8Activities.reduce(
+			(currentState, activity) =>
+				achievementReducer(currentState, activity, goalsMap),
+			state,
+		);
+
+		// Verify state after week 8 - streaks should be 1 since goals are met
+		expect(stateAfterWeek8.streaks.currentAttendanceStreak).toBe(1);
+		expect(stateAfterWeek8.streaks.currentRunningStreak).toBe(1);
+		expect(stateAfterWeek8.streaks.bestAttendanceStreak).toBe(1);
+		expect(stateAfterWeek8.streaks.bestRunningStreak).toBe(1);
+		expect(stateAfterWeek8.streaks.lastAttendanceStreakWeek).toBe("2024-8");
+		expect(stateAfterWeek8.streaks.lastRunningStreakWeek).toBe("2024-8");
+
+		// Add activity in week 11 - this should break streaks since week 9 and 10 had goals
+		const week11Activity: CompletedEnduranceRun = {
+			id: "test-run-11a",
+			activity: "endurance-run",
+			activityTimestamp: week11Timestamp,
+			attendanceId: "test-id",
+			laps: "8",
+			minutes: "48",
+			submittedAt: week11Timestamp,
+		};
+
+		const stateAfterWeek11 = achievementReducer(
+			stateAfterWeek8,
+			week11Activity,
+			goalsMap,
+		);
+
+		// Verify that streaks are broken since week 9 and 10 had goals but no activities
+		expect(stateAfterWeek11.streaks.currentAttendanceStreak).toBe(0);
+		expect(stateAfterWeek11.streaks.currentRunningStreak).toBe(0);
+		expect(stateAfterWeek11.streaks.bestAttendanceStreak).toBe(1);
+		expect(stateAfterWeek11.streaks.bestRunningStreak).toBe(1);
+		expect(stateAfterWeek11.streaks.lastAttendanceStreakWeek).toBe(null);
+		expect(stateAfterWeek11.streaks.lastRunningStreakWeek).toBe(null);
+
+		// Weekly activities should be reset for week 11
+		expect(stateAfterWeek11.weeklyActivities).toEqual({
+			enduranceRun: 1, // from the new activity
+			personalTechnique: 0,
+			probabilityPractice: 0,
+			buddyTraining: 0,
+		});
+
+		// Week should be updated to week 11
+		expect(stateAfterWeek11.currentWeek).toBe("2024-11");
+	});
 });

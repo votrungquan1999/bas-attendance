@@ -1,6 +1,6 @@
 import type { CompletedActivity, WeeklyGoals } from "../types";
-import { DateTime } from "luxon";
 import { cloneDeep } from "lodash";
+import { getWeekKey, getNextWeek, parseWeekKey } from "../../helpers/weekUtils";
 
 export interface WeeklyProgress {
 	enduranceRun: number;
@@ -46,11 +46,6 @@ export class NoGoalsFoundError extends Error {
 		super(`No goals found for week ${weekKey}`);
 		this.weekKey = weekKey;
 	}
-}
-
-function getWeekKey(timestamp: number): string {
-	const dt = DateTime.fromMillis(timestamp, { zone: "Asia/Saigon" });
-	return `${dt.year}-${dt.weekNumber}`;
 }
 
 function hasThirtyMinGoals(goals: WeeklyGoals): boolean {
@@ -111,6 +106,48 @@ function handleWeekTransition(
 ): AchievementState {
 	const newState = cloneDeep(state);
 	const prevWeekGoals = goalsMap[state.currentWeek];
+
+	// Check if there are any skipped weeks with goals
+	const { year: currentYear, week: currentWeek } = parseWeekKey(
+		state.currentWeek,
+	);
+	const { year: newYear, week: newWeek } = parseWeekKey(newWeekKey);
+
+	// If years are different or weeks are not consecutive
+	if (currentYear !== newYear || newWeek - currentWeek > 1) {
+		// Check each week in between for goals
+		let { year: checkYear, week: checkWeek } = getNextWeek(
+			currentYear,
+			currentWeek,
+		);
+
+		while (
+			checkYear < newYear ||
+			(checkYear === newYear && checkWeek < newWeek)
+		) {
+			const checkWeekKey = `${checkYear}-${checkWeek}`;
+			const weekGoals = goalsMap[checkWeekKey];
+
+			if (!weekGoals) {
+				throw new NoGoalsFoundError(checkWeekKey);
+			}
+
+			// If there are goals for this week, reset streaks since they weren't met
+			if (hasThirtyMinGoals(weekGoals)) {
+				newState.streaks.currentAttendanceStreak = 0;
+				newState.streaks.lastAttendanceStreakWeek = null;
+			}
+			if (hasRunningGoals(weekGoals)) {
+				newState.streaks.currentRunningStreak = 0;
+				newState.streaks.lastRunningStreakWeek = null;
+			}
+
+			// Move to next week
+			const next = getNextWeek(checkYear, checkWeek);
+			checkYear = next.year;
+			checkWeek = next.week;
+		}
+	}
 
 	// if the previous week has thirty-minute goals and does not meet them, reset the attendance streak
 	if (
