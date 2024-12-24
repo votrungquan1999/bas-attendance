@@ -81,6 +81,8 @@ describe("query_getAchievementForAthlete", () => {
 			: 0;
 
 		// for new activities, the id should be lastActivityId + 1, +2, +3, ...
+		// each activity should have a different timestamp, incrementing by 1 hour
+		const oneHour = 60 * 60 * 1000;
 		const activities = [
 			// Personal Technique (2 required)
 			{
@@ -89,8 +91,8 @@ describe("query_getAchievementForAthlete", () => {
 				activity: "30-minutes-session",
 				thirtyMinActivity: "personal-technique",
 				thirtyMinExplanation: "Practice personal technique",
-				activityTimestamp: timestamp,
-				submittedAt: timestamp,
+				activityTimestamp: timestamp + 0 * oneHour,
+				submittedAt: timestamp + 0 * oneHour,
 			},
 			{
 				id: String(lastActivityId + 2),
@@ -98,8 +100,8 @@ describe("query_getAchievementForAthlete", () => {
 				activity: "30-minutes-session",
 				thirtyMinActivity: "personal-technique",
 				thirtyMinExplanation: "Practice personal technique",
-				activityTimestamp: timestamp,
-				submittedAt: timestamp,
+				activityTimestamp: timestamp + oneHour,
+				submittedAt: timestamp + oneHour,
 			},
 			// Probability Practice (1 required)
 			{
@@ -110,8 +112,8 @@ describe("query_getAchievementForAthlete", () => {
 				practiceType: "layup",
 				practiceLevel: "1",
 				practiceDescription: "Practice layup",
-				activityTimestamp: timestamp,
-				submittedAt: timestamp,
+				activityTimestamp: timestamp + 2 * oneHour,
+				submittedAt: timestamp + 2 * oneHour,
 			},
 			// Buddy Training (1 required)
 			{
@@ -120,8 +122,8 @@ describe("query_getAchievementForAthlete", () => {
 				activity: "30-minutes-session",
 				thirtyMinActivity: "buddy-training",
 				thirtyMinExplanation: "Train with buddy",
-				activityTimestamp: timestamp,
-				submittedAt: timestamp,
+				activityTimestamp: timestamp + 3 * oneHour,
+				submittedAt: timestamp + 3 * oneHour,
 			},
 			...(includeRun
 				? ([
@@ -132,8 +134,8 @@ describe("query_getAchievementForAthlete", () => {
 							activity: "endurance-run",
 							laps: "8",
 							minutes: "48",
-							activityTimestamp: timestamp,
-							submittedAt: timestamp,
+							activityTimestamp: timestamp + 4 * oneHour,
+							submittedAt: timestamp + 4 * oneHour,
 						},
 						{
 							id: String(lastActivityId + 6),
@@ -141,8 +143,8 @@ describe("query_getAchievementForAthlete", () => {
 							activity: "endurance-run",
 							laps: "8",
 							minutes: "48",
-							activityTimestamp: timestamp,
-							submittedAt: timestamp,
+							activityTimestamp: timestamp + 5 * oneHour,
+							submittedAt: timestamp + 5 * oneHour,
 						},
 					] as const)
 				: []),
@@ -326,6 +328,146 @@ describe("query_getAchievementForAthlete", () => {
 				.collection<WeeklyGoalsCollectionDocument>(WeeklyGoalsCollectionName)
 				.findOne({ weekId });
 			expect(weeklyGoal).not.toBeNull();
+		}),
+	);
+
+	it(
+		"should handle year transitions correctly",
+		withTestContext(async () => {
+			// Create timestamps for the last week of one year and first week of next year
+			const lastWeekOfYear = DateTime.fromObject(
+				{ weekYear: 2023, weekNumber: 52 },
+				{ zone: "Asia/Saigon" },
+			).toMillis();
+			const firstWeekOfYear = DateTime.fromObject(
+				{ weekYear: 2024, weekNumber: 1 },
+				{ zone: "Asia/Saigon" },
+			).toMillis();
+
+			// Setup weekly goals for both weeks
+			const lastWeekId = "2023-W52" as WeekId;
+			const firstWeekId = "2024-W01" as WeekId;
+			await setupWeeklyGoals(lastWeekId);
+			await setupWeeklyGoals(firstWeekId);
+
+			// Add activities for both weeks
+			await generateWeekActivities("athlete1", lastWeekOfYear);
+			await generateWeekActivities("athlete1", firstWeekOfYear);
+
+			// Calculate achievement
+			const result = await query_getAchievementForAthlete("athlete1");
+
+			// Verify streaks continue across year boundary
+			expect(result.streaks.currentAttendanceStreak).toBe(2);
+			expect(result.streaks.bestAttendanceStreak).toBe(2);
+			expect(result.streaks.currentRunningStreak).toBe(2);
+			expect(result.streaks.bestRunningStreak).toBe(2);
+			expect(result.lastActivityId).toBe("12");
+		}),
+	);
+
+	it(
+		"should handle incomplete activity sets correctly",
+		withTestContext(async () => {
+			const db = getMongoDB();
+			const activitiesCollection =
+				db.collection<ActivitiesCollectionDocument>("activities");
+
+			const timestamp = Date.now();
+			const oneHour = 60 * 60 * 1000;
+			const weekId =
+				`${DateTime.fromMillis(timestamp, { zone: "Asia/Saigon" }).toFormat("yyyy-'W'WW")}` as WeekId;
+			await setupWeeklyGoals(weekId);
+
+			// Add incomplete set of activities (missing one personal technique and endurance runs)
+			const activities = [
+				{
+					id: "1",
+					attendanceId: "athlete1",
+					activity: "30-minutes-session",
+					thirtyMinActivity: "personal-technique",
+					thirtyMinExplanation: "Practice personal technique",
+					activityTimestamp: timestamp,
+					submittedAt: timestamp,
+				},
+				{
+					id: "2",
+					attendanceId: "athlete1",
+					activity: "30-minutes-session",
+					thirtyMinActivity: "probability-practice",
+					practiceType: "layup",
+					practiceLevel: "1",
+					practiceDescription: "Practice layup",
+					activityTimestamp: timestamp + oneHour,
+					submittedAt: timestamp + oneHour,
+				},
+				{
+					id: "3",
+					attendanceId: "athlete1",
+					activity: "30-minutes-session",
+					thirtyMinActivity: "buddy-training",
+					thirtyMinExplanation: "Train with buddy",
+					activityTimestamp: timestamp + 2 * oneHour,
+					submittedAt: timestamp + 2 * oneHour,
+				},
+			] as const;
+
+			await activitiesCollection.insertMany(activities);
+
+			// Calculate achievement
+			const result = await query_getAchievementForAthlete("athlete1");
+
+			// Verify incomplete activities don't count towards streaks
+			expect(result.streaks.currentAttendanceStreak).toBe(0);
+			expect(result.streaks.bestAttendanceStreak).toBe(0);
+			expect(result.streaks.currentRunningStreak).toBe(0);
+			expect(result.streaks.bestRunningStreak).toBe(0);
+			expect(result.lastActivityId).toBe("3");
+			expect(result.weeklyActivities).toEqual({
+				enduranceRun: 0,
+				personalTechnique: 1,
+				probabilityPractice: 1,
+				buddyTraining: 1,
+			});
+		}),
+	);
+
+	it(
+		"should handle non-consecutive weeks correctly",
+		withTestContext(async () => {
+			// Use absolute weeks in 2024
+			const week1Timestamp = DateTime.fromObject(
+				{ weekYear: 2024, weekNumber: 1 },
+				{ zone: "Asia/Saigon" },
+			).toMillis();
+			const week3Timestamp = DateTime.fromObject(
+				{ weekYear: 2024, weekNumber: 3 },
+				{ zone: "Asia/Saigon" },
+			).toMillis();
+
+			// Add activities for week 1
+			await generateWeekActivities("athlete1", week1Timestamp);
+
+			// Calculate achievement after week 1
+			const resultWeek1 = await query_getAchievementForAthlete("athlete1");
+			expect(resultWeek1.streaks.currentAttendanceStreak).toBe(1);
+			expect(resultWeek1.streaks.bestAttendanceStreak).toBe(1);
+			expect(resultWeek1.streaks.currentRunningStreak).toBe(1);
+			expect(resultWeek1.streaks.bestRunningStreak).toBe(1);
+			expect(resultWeek1.lastActivityId).toBe("6");
+
+			// Add activities for week 3 (skipping week 2)
+			await generateWeekActivities("athlete1", week3Timestamp);
+
+			// Calculate achievement after week 3
+			const resultWeek3 = await query_getAchievementForAthlete("athlete1");
+
+			// Verify streaks are broken by the gap
+			expect(resultWeek3.streaks.currentAttendanceStreak).toBe(1);
+			expect(resultWeek3.streaks.bestAttendanceStreak).toBe(1);
+			expect(resultWeek3.streaks.currentRunningStreak).toBe(1);
+			expect(resultWeek3.streaks.bestRunningStreak).toBe(1);
+			expect(resultWeek3.lastActivityId).toBe("12");
 		}),
 	);
 });

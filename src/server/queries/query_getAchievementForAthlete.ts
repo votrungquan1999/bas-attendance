@@ -15,9 +15,9 @@ import {
 	unstable_cacheLife as cacheLife,
 	unstable_cacheTag as cacheTag,
 } from "next/cache";
-import { DateTime } from "luxon";
 import query_getWeeklyGoal from "./query_getWeeklyGoal";
 import { nanoid } from "nanoid";
+import { getWeekKey, parseWeekKey, getNextWeek } from "../../helpers/weekUtils";
 
 export default injectMongoDB(async function query_getAchievementForAthlete(
 	athleteId: string,
@@ -102,12 +102,51 @@ export default injectMongoDB(async function query_getAchievementForAthlete(
 	}
 
 	// Add goals for all new activities
-	for (const activity of activities) {
-		const weekKey = getWeekKey(activity.activityTimestamp);
-		if (!goalsMap[weekKey]) {
-			const weekId = `${weekKey.replace("-", "-W")}` as WeekId;
-			const weeklyGoal = await query_getWeeklyGoal(weekId);
-			goalsMap[weekKey] = weeklyGoal.goals;
+	if (activities.length > 0) {
+		const lastActivityKey = getWeekKey(
+			activities[activities.length - 1].activityTimestamp,
+		);
+
+		// If we have a saved state, check for goals in weeks between current week and last activity
+		if (currentAchievement?.state.currentWeek) {
+			const { year: currentYear, week: currentWeek } = parseWeekKey(
+				currentAchievement.state.currentWeek,
+			);
+			const { year: lastYear, week: lastWeek } = parseWeekKey(lastActivityKey);
+
+			// Start from the week after current week
+			let { year: checkYear, week: checkWeek } = getNextWeek(
+				currentYear,
+				currentWeek,
+			);
+
+			// Check each week until we reach the last activity week
+			while (
+				checkYear < lastYear ||
+				(checkYear === lastYear && checkWeek < lastWeek)
+			) {
+				const weekKey = `${checkYear}-${checkWeek}`;
+				if (!goalsMap[weekKey]) {
+					const weekId = `${weekKey.replace("-", "-W")}` as WeekId;
+					const weeklyGoal = await query_getWeeklyGoal(weekId);
+					goalsMap[weekKey] = weeklyGoal.goals;
+				}
+
+				// Move to next week
+				const next = getNextWeek(checkYear, checkWeek);
+				checkYear = next.year;
+				checkWeek = next.week;
+			}
+		}
+
+		// Add goals for all new activities
+		for (const activity of activities) {
+			const weekKey = getWeekKey(activity.activityTimestamp);
+			if (!goalsMap[weekKey]) {
+				const weekId = `${weekKey.replace("-", "-W")}` as WeekId;
+				const weeklyGoal = await query_getWeeklyGoal(weekId);
+				goalsMap[weekKey] = weeklyGoal.goals;
+			}
 		}
 	}
 
@@ -136,8 +175,3 @@ export default injectMongoDB(async function query_getAchievementForAthlete(
 
 	return state;
 });
-
-function getWeekKey(timestamp: number): string {
-	const dt = DateTime.fromMillis(timestamp, { zone: "Asia/Saigon" });
-	return `${dt.year}-${dt.weekNumber}`;
-}
