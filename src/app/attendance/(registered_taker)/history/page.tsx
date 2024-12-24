@@ -6,7 +6,7 @@ import getWeekRange, { type WeekRange } from "src/helpers/weekRange";
 import groupActivities from "src/helpers/activities/groupActivities";
 import query_getTakerFromCookies from "../../../../server/queries/query_getTakerFromCookies";
 import action_resetTaker from "../../../../server/actions/action_resetTaker";
-import type { ActivitiesCollection } from "src/server/collections";
+import type { ActivitiesCollectionDocument } from "src/server/collections";
 import getDB from "src/server/db";
 import { ActivitiesCollectionName } from "src/server/collections";
 import { WEEKLY_GOALS } from "src/server/constants";
@@ -19,10 +19,10 @@ export const metadata: Metadata = {
 async function query_getAthleteAttendanceData(
 	weekRange: WeekRange,
 	takerId: string,
-): Promise<ActivitiesCollection[]> {
+): Promise<ActivitiesCollectionDocument[]> {
 	const { db, close } = await getDB();
 
-	const activitiesCollection = db.collection<ActivitiesCollection>(
+	const activitiesCollection = db.collection<ActivitiesCollectionDocument>(
 		ActivitiesCollectionName,
 	);
 

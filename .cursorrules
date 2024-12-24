@@ -1,0 +1,10 @@
+do not delete the comments. use Bun for writing tests. 
+
+when adding testcases, always add test case one by one, always try to run the test in the terminal to see if it breaks.
+
+do not remove only from test.only. use it for debugging.
+do not remove test.skip. it can be useful for skipping tests.
+
+when modifying test, always try to run the test in the terminal to see if it breaks.
+
+do not delete other part of the code that is not related to the current request.

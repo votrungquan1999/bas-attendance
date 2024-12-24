@@ -1,10 +1,12 @@
 import { WeeklyGoalsCollectionName } from "../collections";
-import getDB from "../db";
 import type { WeekId } from "../collections";
 import action_ensureGoal from "../actions/action_ensureGoal";
+import { getMongoDB, injectMongoDB } from "../withMongoDB";
 
-export default async function query_getWeeklyGoal(weekId: WeekId) {
-	const { db, close } = await getDB();
+export default injectMongoDB(async function query_getWeeklyGoal(
+	weekId: WeekId,
+) {
+	const db = getMongoDB();
 
 	await action_ensureGoal(weekId);
 
@@ -16,7 +18,5 @@ export default async function query_getWeeklyGoal(weekId: WeekId) {
 		throw new Error("Weekly goals not found although ensureGoal was called");
 	}
 
-	await close();
-
 	return weeklyGoals;
-}
+});

@@ -1,13 +1,16 @@
 import type { CompletedActivity, WeeklyGoals } from "src/server/types";
 import type { Brand } from "utility-types";
+import type { AchievementState } from "./queries/achievementReducer";
 
-export type ActivitiesCollection = CompletedActivity;
+export type ActivitiesCollectionDocument = CompletedActivity;
 
 export const ActivitiesCollectionName = "activities";
 
 export const WeeklyGoalsCollectionName = "weekly_goals";
 
-export type WeeklyGoalsCollection = {
+export const AchievementsCollectionName = "achievements";
+
+export type WeeklyGoalsCollectionDocument = {
 	id: string;
 
 	// has form YYYY-W{weekNumber}
@@ -17,6 +20,14 @@ export type WeeklyGoalsCollection = {
 
 	updatedAt: number;
 	updatedBy: string;
+};
+
+export type AchievementCollectionDocument = {
+	id: string;
+	athleteId: string;
+	state: AchievementState;
+	lastActivityId: string | null;
+	updatedAt: number;
 };
 
 export type WeekId = Brand<string, "WeekId">;
