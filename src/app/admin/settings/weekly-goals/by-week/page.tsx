@@ -26,7 +26,7 @@ export default async function WeeklyGoalsSettings({
 			<div className="flex items-center bg-white rounded-md p-4 shadow">
 				<WeekRangeNav weekRange={weekRange} />
 			</div>
-			<WeeklyGoalsProvider initialState={weeklyGoals.goals}>
+			<WeeklyGoalsProvider key={weekId} initialState={weeklyGoals.goals}>
 				<WeeklyGoalsClientWrapper />
 
 				<div className="flex justify-end">
