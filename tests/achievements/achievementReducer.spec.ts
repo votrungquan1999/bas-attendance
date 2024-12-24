@@ -4,7 +4,7 @@ import {
 	NoGoalsFoundError,
 	type AchievementState,
 	type WeeklyGoalsMap,
-} from "../achievementReducer";
+} from "../../src/server/queries/achievementReducer";
 import type {
 	CompletedEnduranceRun,
 	CompletedThirtyMinActivity,

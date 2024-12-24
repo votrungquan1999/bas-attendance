@@ -1,5 +1,5 @@
 import { describe, it, expect, afterAll } from "bun:test";
-import query_getAchievementForAthlete from "../query_getAchievementForAthlete";
+import query_getAchievementForAthlete from "../../src/server/queries/query_getAchievementForAthlete";
 import {
 	type ActivitiesCollectionDocument,
 	type WeeklyGoalsCollectionDocument,
@@ -9,7 +9,7 @@ import {
 	ActivitiesCollectionName,
 	AchievementsCollectionName,
 } from "src/server/collections";
-import withTestContext, { cleanUp } from "src/helpers/withTestContext";
+import withTestContext, { cleanUp } from "../helpers/withTestContext";
 import { getMongoDB } from "src/server/withMongoDB";
 import { DateTime } from "luxon";
 import type { WeeklyGoals } from "src/server/types";

@@ -3,12 +3,12 @@
  */
 
 import { describe, it, expect, mock, afterAll } from "bun:test";
-import query_getAchievements from "../query_getAchievements";
+import query_getAchievements from "../../src/server/queries/query_getAchievements";
 import {
 	type ActivitiesCollectionDocument,
 	ActivitiesCollectionName,
 } from "src/server/collections";
-import withTestContext, { cleanUp } from "src/helpers/withTestContext";
+import withTestContext, { cleanUp } from "../helpers/withTestContext";
 import { getMongoDB } from "src/server/withMongoDB";
 
 mock.module(
