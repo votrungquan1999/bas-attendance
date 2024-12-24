@@ -1,0 +1,4 @@
+# Ignore test files and directories
+tests/
+*.test.*
+*.spec.* 
