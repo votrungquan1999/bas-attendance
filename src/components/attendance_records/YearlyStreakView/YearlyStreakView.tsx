@@ -34,7 +34,7 @@ export default function YearlyStreakView({
 	weeksWithoutGoals = [],
 	year,
 }: YearlyStreakViewProps) {
-	const startOfYear = DateTime.local(year, 1, 1);
+	const startOfYear = DateTime.fromObject({ year }, { zone: "Asia/Saigon" });
 	const endOfYear = startOfYear.endOf("year");
 
 	const weeks: WeekInfo[] = [];
@@ -79,7 +79,7 @@ export default function YearlyStreakView({
 				<YearlyStreakViewHeader>
 					<div className="flex flex-col gap-1">
 						<YearlyStreakViewTitle>
-							<YearSelect /> Training Streak
+							<YearSelect currentYear={year} /> Training Streak
 						</YearlyStreakViewTitle>
 						<YearlyStreakViewTotalWeeks>
 							{weeks.length} weeks total

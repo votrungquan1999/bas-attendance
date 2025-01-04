@@ -1,6 +1,6 @@
 "use client";
 
-import { useStreakViewYear, useSetStreakViewYear } from "./StreakViewContext";
+import { useState, useTransition } from "react";
 import {
 	Select,
 	SelectContent,
@@ -8,10 +8,13 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "src/shadcn/components/ui/select";
+import { action_handleSelectYear } from "src/server/actions/action_handleSelectYear";
+import { Loader2 } from "lucide-react";
+import { cn } from "src/shadcn/lib/utils";
 
-export function YearSelect() {
-	const currentYear = useStreakViewYear();
-	const setYear = useSetStreakViewYear();
+export function YearSelect({ currentYear }: { currentYear: number }) {
+	const [isPending, startTransition] = useTransition();
+	const [selectedYear, setSelectedYear] = useState(currentYear);
 
 	// Generate a list of years from 2024 to current year + 1
 	const currentDate = new Date();
@@ -20,13 +23,28 @@ export function YearSelect() {
 		(_, i) => 2024 + i,
 	);
 
+	function handleChangeYear(year: number) {
+		setSelectedYear(year);
+
+		startTransition(() => {
+			action_handleSelectYear(year);
+		});
+	}
+
 	return (
 		<Select
-			value={currentYear.toString()}
-			onValueChange={(value) => setYear(Number(value))}
+			value={selectedYear.toString()}
+			onValueChange={(value) => handleChangeYear(Number(value))}
 		>
-			<SelectTrigger className="w-[4.5rem] p-1 h-auto">
+			<SelectTrigger
+				className={cn(
+					"w-[5.5rem] p-1 h-auto",
+					isPending && "animate-pulse opacity-50",
+				)}
+			>
 				<SelectValue />
+
+				{isPending && <Loader2 className="w-4 h-4 animate-spin" />}
 			</SelectTrigger>
 			<SelectContent>
 				{years.map((year) => (

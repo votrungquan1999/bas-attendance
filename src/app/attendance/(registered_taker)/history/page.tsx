@@ -7,6 +7,7 @@ import getWeekRange, { type WeekRange } from "src/helpers/weekRange";
 import groupActivities from "src/helpers/activities/groupActivities";
 import query_getTakerFromCookies from "../../../../server/queries/query_getTakerFromCookies";
 import action_resetTaker from "../../../../server/actions/action_resetTaker";
+import { query_getSelectedYear } from "../../../../server/actions/action_handleSelectYear";
 import type { ActivitiesCollectionDocument } from "src/server/collections";
 import getDB from "src/server/db";
 import { ActivitiesCollectionName } from "src/server/collections";
@@ -52,6 +53,7 @@ export default async function HistoryPage({
 	const weekRange = await getWeekRange(weekOffset);
 
 	const taker = await query_getTakerFromCookies();
+	const selectedYear = await query_getSelectedYear();
 
 	// Get attendance data for the current user
 	const attendanceData = await query_getAthleteAttendanceData(
@@ -125,7 +127,7 @@ export default async function HistoryPage({
 				/>
 
 				<YearlyStreakView
-					year={2025}
+					year={selectedYear}
 					completedWeeks={[
 						"2024-01",
 						"2024-02",
