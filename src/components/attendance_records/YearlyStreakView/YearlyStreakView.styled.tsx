@@ -139,7 +139,7 @@ export function WeekPopoverActivitiesStatus({
 	hasNoGoal,
 }: {
 	isCompleted: boolean;
-	hasNoGoal: boolean;
+	hasNoGoal?: boolean;
 }) {
 	if (hasNoGoal) {
 		return <div className="text-gray-400">No goals set for this week</div>;

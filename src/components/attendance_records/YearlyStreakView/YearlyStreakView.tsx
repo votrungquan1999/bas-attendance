@@ -15,7 +15,7 @@ import {
 	AttendanceWeekRowRoot,
 	BiMonthlyLabel,
 	BiMonthlyNavButton,
-	BiMonthlyWeekRow,
+	BiMonthlyWeekRoot,
 	RunningWeekRowRoot,
 } from "./YearlyStreakView.client";
 
@@ -27,6 +27,7 @@ import { ChevronRight } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
 import { YearSelect } from "./YearSelect";
 import { AttendanceWeekGrid, RunningWeekGrid } from "./YearlyStreakView.Grid";
+import { AttendanceWeekMobileRow } from "./YearlyStreakView.Mobile";
 
 export default function YearlyStreakView({
 	completedWeeks,
@@ -61,6 +62,17 @@ export default function YearlyStreakView({
 		currentWeek = currentWeek.plus({ weeks: 1 });
 	}
 
+	const weeksByBiMonthly = Array.from({ length: 6 }, (_, i) => {
+		const startMonth = i * 2 + 1;
+		return {
+			biMonthlyIndex: i,
+			weeks: weeks.filter((week) => {
+				const month = week.month;
+				return month === startMonth || month === startMonth + 1;
+			}),
+		};
+	});
+
 	return (
 		<StreakViewProvider>
 			<YearlyStreakViewRoot>
@@ -90,10 +102,18 @@ export default function YearlyStreakView({
 							</BiMonthlyNavButton>
 						</YearlyStreakViewBiMonthlyNav>
 
-						<BiMonthlyWeekRow
-							completedWeeks={completedWeeks}
-							weeksWithoutGoals={weeksWithoutGoals}
-						/>
+						{weeksByBiMonthly.map((biMonthly) => (
+							<BiMonthlyWeekRoot
+								key={biMonthly.biMonthlyIndex}
+								period={biMonthly.biMonthlyIndex}
+							>
+								<AttendanceWeekMobileRow
+									weeks={biMonthly.weeks}
+									completedWeeks={completedWeeks}
+									weeksWithoutGoals={weeksWithoutGoals}
+								/>
+							</BiMonthlyWeekRoot>
+						))}
 					</MobileWeekViewProvider>
 				</YearlyStreakViewMobileView>
 

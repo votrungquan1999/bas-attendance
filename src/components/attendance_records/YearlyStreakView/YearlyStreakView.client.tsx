@@ -6,13 +6,8 @@ import { useStreakViewYearWeeks, useStreakViewType } from "./StreakViewContext";
 import {
 	useSetBiMonthlyIndex,
 	useMobileWeekViewState,
-	useBiMonthlyWeeks,
 } from "./MobileWeekViewContext";
 import { StreakType } from "./types";
-import {
-	AttendanceWeekMobileRow,
-	RunningWeekMobileRow,
-} from "./YearlyStreakView.Mobile";
 
 export function BiMonthlyWeekRoot({
 	children,
@@ -28,35 +23,6 @@ export function BiMonthlyWeekRoot({
 	}
 
 	return children;
-}
-
-export function BiMonthlyWeekRow({
-	completedWeeks,
-	weeksWithoutGoals = [],
-}: {
-	completedWeeks: string[];
-	weeksWithoutGoals?: string[];
-}) {
-	const biMonthlyWeeks = useBiMonthlyWeeks();
-	const streakType = useStreakViewType();
-
-	if (streakType === StreakType.ATTENDANCE) {
-		return (
-			<AttendanceWeekMobileRow
-				weeks={biMonthlyWeeks}
-				completedWeeks={completedWeeks}
-				weeksWithoutGoals={weeksWithoutGoals}
-			/>
-		);
-	}
-
-	return (
-		<RunningWeekMobileRow
-			weeks={biMonthlyWeeks}
-			completedWeeks={completedWeeks}
-			weeksWithoutGoals={weeksWithoutGoals}
-		/>
-	);
 }
 
 export function BiMonthlyLabel() {

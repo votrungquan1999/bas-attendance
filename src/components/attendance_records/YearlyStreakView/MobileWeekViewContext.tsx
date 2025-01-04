@@ -1,7 +1,6 @@
 "use client";
 
 import { createReducerContext } from "src/components/reducerContext";
-import { useStreakViewYearWeeks } from "./StreakViewContext";
 
 interface MobileWeekViewState {
 	biMonthlyIndex: number;
@@ -45,20 +44,4 @@ export function useSetBiMonthlyIndex() {
 	return (index: number) => {
 		dispatch({ type: "setBiMonthlyIndex", payload: index });
 	};
-}
-
-export function useBiMonthlyWeeks() {
-	const { biMonthlyIndex } = useState();
-	const weeks = useStreakViewYearWeeks();
-
-	// Split weeks into bi-monthly periods (roughly 8-9 weeks each)
-	const biMonthlyPeriods = Array.from({ length: 6 }, (_, i) => {
-		const startMonth = i * 2 + 1;
-		return weeks.filter((week) => {
-			const month = week.month;
-			return month === startMonth || month === startMonth + 1;
-		});
-	});
-
-	return biMonthlyPeriods[biMonthlyIndex];
 }
