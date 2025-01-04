@@ -53,8 +53,6 @@ export function AttendanceWeekMobileRow({
 	return (
 		<div className="flex flex-row gap-4 justify-between flex-wrap">
 			{Object.entries(groupedByMonth).map(([month, weeks]) => {
-				const isOddMonth = Number.parseInt(month) % 2 === 1;
-
 				return (
 					<div key={month} className="flex flex-col gap-2 justify-between">
 						<div className="text-sm font-medium text-gray-600">
@@ -65,8 +63,7 @@ export function AttendanceWeekMobileRow({
 
 						<div
 							className={cn(
-								"flex flow-row gap-4 p-2 rounded-md",
-								isOddMonth ? "bg-slate-100" : "bg-slate-50",
+								"flex flow-row gap-4 p-2 rounded-md bg-slate-50 justify-between",
 							)}
 						>
 							{weeks.map((week) => {
@@ -165,8 +162,6 @@ export function RunningWeekMobileRow({
 	return (
 		<div className="flex flex-row gap-4 justify-between flex-wrap">
 			{Object.entries(groupedByMonth).map(([month, weeks]) => {
-				const isOddMonth = Number.parseInt(month) % 2 === 1;
-
 				return (
 					<div key={month} className="flex flex-col gap-2 justify-between">
 						<div className="text-sm font-medium text-gray-600">
@@ -192,8 +187,7 @@ export function RunningWeekMobileRow({
 
 						<div
 							className={cn(
-								"flex flow-row gap-4 p-2 rounded-md",
-								isOddMonth ? "bg-slate-100" : "bg-slate-50",
+								"flex flow-row gap-4 p-2 rounded-md bg-slate-50 justify-between",
 							)}
 						>
 							{weeks.map((week) => {

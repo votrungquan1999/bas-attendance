@@ -47,7 +47,6 @@ export function AttendanceWeekGrid({
 		<div className="grid grid-cols-3 grid-rows-4 gap-4">
 			{Array.from({ length: 12 }, (_, i) => i + 1).map((month) => {
 				const monthWeeks = weeks.filter((week) => week.month === month);
-				const isOddMonth = month % 2 === 1;
 
 				return (
 					<div key={month} className="flex flex-col gap-2">
@@ -57,8 +56,7 @@ export function AttendanceWeekGrid({
 
 						<div
 							className={cn(
-								"flex flex-row flex-wrap gap-2 p-2 rounded-md",
-								isOddMonth ? "bg-slate-100" : "bg-slate-50",
+								"flex flex-row flex-wrap gap-2 p-2 rounded-md bg-slate-50 justify-between",
 							)}
 						>
 							{monthWeeks.map((week) => {
@@ -156,7 +154,6 @@ export function RunningWeekGrid({
 		<div className="grid grid-cols-3 grid-rows-4 gap-4">
 			{Array.from({ length: 12 }, (_, i) => i + 1).map((month) => {
 				const monthWeeks = weeks.filter((week) => week.month === month);
-				const isOddMonth = month % 2 === 1;
 
 				return (
 					<div key={month} className="flex flex-col gap-2">
@@ -174,8 +171,7 @@ export function RunningWeekGrid({
 
 						<div
 							className={cn(
-								"flex flex-row flex-wrap gap-2 p-2 rounded-md min-h-[60px]",
-								isOddMonth ? "bg-slate-100" : "bg-slate-50",
+								"flex flex-row flex-wrap gap-2 p-2 rounded-md min-h-[60px] bg-slate-50 justify-between",
 							)}
 						>
 							{monthWeeks.map((week) => {
