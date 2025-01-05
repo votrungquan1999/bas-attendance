@@ -1,13 +1,13 @@
 import { redirect } from "next/navigation";
 import { getTakers } from "../../app/attendance/taker/getTakers";
-import { getRegisterTake } from "../../app/attendance/(registered_taker)/activity/getRegisterTake";
+import { getRegisterAthlete } from "../../app/attendance/(registered_taker)/activity/getRegisterAthlete";
 import action_resetTaker from "../actions/action_resetTaker";
 
 export default async function query_getTakerFromCookies(): Promise<{
 	id: string;
 	name: string;
 }> {
-	const takerId = await getRegisterTake();
+	const takerId = await getRegisterAthlete();
 
 	if (!takerId) {
 		redirect("/attendance");
