@@ -27,13 +27,12 @@ import { ChevronRight } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
 import { YearSelect } from "./YearSelect";
 import { AttendanceWeekGrid, RunningWeekGrid } from "./YearlyStreakView.Grid";
-import { AttendanceWeekMobileRow } from "./YearlyStreakView.Mobile";
+import {
+	AttendanceWeekMobileRow,
+	RunningWeekMobileRow,
+} from "./YearlyStreakView.Mobile";
 
-export default function YearlyStreakView({
-	completedWeeks,
-	weeksWithoutGoals = [],
-	year,
-}: YearlyStreakViewProps) {
+export default function YearlyStreakView({ year }: YearlyStreakViewProps) {
 	const startOfYear = DateTime.fromObject({ year }, { zone: "Asia/Saigon" });
 	const endOfYear = startOfYear.endOf("year");
 
@@ -90,6 +89,7 @@ export default function YearlyStreakView({
 					</div>
 				</YearlyStreakViewHeader>
 
+				{/* Mobile view */}
 				<YearlyStreakViewMobileView>
 					<MobileWeekViewProvider>
 						<YearlyStreakViewBiMonthlyNav>
@@ -107,31 +107,26 @@ export default function YearlyStreakView({
 								key={biMonthly.biMonthlyIndex}
 								period={biMonthly.biMonthlyIndex}
 							>
-								<AttendanceWeekMobileRow
-									weeks={biMonthly.weeks}
-									completedWeeks={completedWeeks}
-									weeksWithoutGoals={weeksWithoutGoals}
-								/>
+								<AttendanceWeekRowRoot>
+									<AttendanceWeekMobileRow weeks={biMonthly.weeks} />
+								</AttendanceWeekRowRoot>
+
+								<RunningWeekRowRoot>
+									<RunningWeekMobileRow weeks={biMonthly.weeks} />
+								</RunningWeekRowRoot>
 							</BiMonthlyWeekRoot>
 						))}
 					</MobileWeekViewProvider>
 				</YearlyStreakViewMobileView>
 
+				{/* Desktop view */}
 				<YearlyStreakViewDesktopView>
 					<AttendanceWeekRowRoot>
-						<AttendanceWeekGrid
-							weeks={weeks}
-							completedWeeks={completedWeeks}
-							weeksWithoutGoals={weeksWithoutGoals}
-						/>
+						<AttendanceWeekGrid weeks={weeks} />
 					</AttendanceWeekRowRoot>
 
 					<RunningWeekRowRoot>
-						<RunningWeekGrid
-							weeks={weeks}
-							completedWeeks={completedWeeks}
-							weeksWithoutGoals={weeksWithoutGoals}
-						/>
+						<RunningWeekGrid weeks={weeks} />
 					</RunningWeekRowRoot>
 				</YearlyStreakViewDesktopView>
 

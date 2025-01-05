@@ -25,7 +25,7 @@ interface GroupedActivities {
 	};
 }
 
-interface WeekCompletionStatus {
+export interface WeekCompletionStatus {
 	weekKey: string;
 	attendanceStatus: {
 		hasNoGoal: boolean;

@@ -8,10 +8,6 @@ export interface WeekInfo {
 
 export interface YearlyStreakViewProps {
 	year: number;
-	// Array of week identifiers in the format "YYYY-WW"
-	completedWeeks: string[];
-	// Array of week identifiers in the format "YYYY-WW" that have no goals set
-	weeksWithoutGoals?: string[];
 }
 
 export enum StreakType {

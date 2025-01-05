@@ -134,24 +134,26 @@ export function WeekPopoverActivitiesTitle({
 	return <div className="font-medium mb-1">{children}</div>;
 }
 
-export function WeekPopoverActivitiesStatus({
-	isCompleted,
-	hasNoGoal,
-}: {
-	isCompleted: boolean;
-	hasNoGoal?: boolean;
-}) {
-	if (hasNoGoal) {
-		return <div className="text-gray-400">No goals set for this week</div>;
-	}
+export function QuarterLabel({ children }: { children: ReactNode }) {
+	return <span className="text-sm font-medium">{children}</span>;
+}
 
+export function MonthLabel({ children }: { children: ReactNode }) {
+	return <div className="text-sm font-medium text-gray-600">{children}</div>;
+}
+
+export function MonthWeeksContainer({ children }: { children: ReactNode }) {
 	return (
-		<div className={isCompleted ? "text-gray-600" : "text-gray-500"}>
-			{isCompleted ? "All weekly goals completed" : "No activities recorded"}
+		<div
+			className={cn(
+				"flex flow-row gap-4 p-2 rounded-md bg-slate-50 justify-between",
+			)}
+		>
+			{children}
 		</div>
 	);
 }
 
-export function QuarterLabel({ children }: { children: ReactNode }) {
-	return <span className="text-sm font-medium">{children}</span>;
+export function MonthContainer({ children }: { children: ReactNode }) {
+	return <div className="flex flex-col gap-2 justify-between">{children}</div>;
 }
