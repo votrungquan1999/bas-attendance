@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import { injectMongoDB } from "src/server/withMongoDB";
 
 export default function withTestMongoDB(fn: () => void) {
-	const dbName = `test-databse-attendances-${nanoid()}`;
+	const dbName = `test-database-attendances-${nanoid()}`;
 
 	const client = new MongoClient("mongodb://localhost:27017");
 	const db = client.db(dbName);
@@ -19,7 +19,7 @@ export async function cleanUp() {
 
 	// drop all the databases
 	for (const database of databases.databases) {
-		if (database.name.startsWith("test-databse-attendances-")) {
+		if (database.name.startsWith("test-database-attendances-")) {
 			await client.db(database.name).dropDatabase();
 		}
 	}
