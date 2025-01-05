@@ -1,5 +1,5 @@
 import { WeeklyGoalsCollectionName } from "../collections";
-import type { WeekId } from "../collections";
+import type { WeekId, WeeklyGoalsCollectionDocument } from "../collections";
 import action_ensureGoal from "../actions/action_ensureGoal";
 import { getMongoDB, injectMongoDB } from "../withMongoDB";
 
@@ -11,7 +11,7 @@ export default injectMongoDB(async function query_getWeeklyGoal(
 	await action_ensureGoal(weekId);
 
 	const weeklyGoals = await db
-		.collection(WeeklyGoalsCollectionName)
+		.collection<WeeklyGoalsCollectionDocument>(WeeklyGoalsCollectionName)
 		.findOne({ weekId });
 
 	if (!weeklyGoals) {

@@ -14,6 +14,7 @@ import { getMongoDB } from "src/server/withMongoDB";
 import { DateTime } from "luxon";
 import type { WeeklyGoals } from "src/server/types";
 import { nanoid } from "nanoid";
+import { getWeekId } from "src/helpers/getWeekId";
 
 // behavior:
 // 1. the achievement state is saved in the database
@@ -312,8 +313,9 @@ describe("query_getAchievementForAthlete", () => {
 			const db = getMongoDB();
 
 			const timestamp = Date.now() - 7 * 24 * 60 * 60 * 1000;
-			const weekId =
-				`${DateTime.fromMillis(timestamp, { zone: "Asia/Saigon" }).toFormat("yyyy-'W'WW")}` as WeekId;
+			const weekId = getWeekId(
+				DateTime.fromMillis(timestamp, { zone: "Asia/Saigon" }),
+			);
 
 			// Add activities without setting up weekly goals first
 			await generateWeekActivities("athlete1", timestamp);

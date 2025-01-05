@@ -4,8 +4,8 @@ import WeekRangeNav from "src/components/attendance_records/WeekRangeNav";
 import WeeklyGoalsClientWrapper from "./WeeklyGoalsClientWrapper";
 import { DateTime } from "luxon";
 import query_getWeeklyGoal from "src/server/queries/query_getWeeklyGoal";
-import type { WeekId } from "src/server/collections";
 import SaveWeeklyGoalButton from "./SaveWeeklyGoalButton";
+import { getWeekId } from "../../../../../helpers/getWeekId";
 
 export default async function WeeklyGoalsSettings({
 	searchParams,
@@ -17,7 +17,7 @@ export default async function WeeklyGoalsSettings({
 
 	// Get the week ID using Luxon from the start date
 	const startDate = DateTime.fromJSDate(weekRange.start).setZone("Asia/Saigon");
-	const weekId = startDate.toFormat("yyyy-'W'WW") as WeekId;
+	const weekId = getWeekId(startDate);
 
 	const weeklyGoals = await query_getWeeklyGoal(weekId);
 

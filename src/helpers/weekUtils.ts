@@ -2,7 +2,7 @@ import { DateTime } from "luxon";
 
 export function getWeekKey(timestamp: number): string {
 	const dt = DateTime.fromMillis(timestamp, { zone: "Asia/Saigon" });
-	return `${dt.year}-${dt.weekNumber}`;
+	return `${dt.weekYear}-${dt.weekNumber}`;
 }
 
 export function getNextWeek(

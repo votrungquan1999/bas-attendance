@@ -10,6 +10,31 @@ export const WeeklyGoalsCollectionName = "weekly_goals";
 
 export const AchievementsCollectionName = "achievements";
 
+export const WeekCompletionStatusCollectionName = "week_completion_status";
+
+export interface WeekCompletionStatusCollectionDocument {
+	id: string;
+	weekId: WeekId;
+	athleteId: string;
+	attendanceStatus: {
+		hasNoGoal: boolean;
+		completed: boolean;
+		remainingGoals: {
+			personalTechnique: number;
+			probabilityPractice: number;
+			buddyTraining: number;
+		};
+	};
+	runningStatus: {
+		hasNoGoal: boolean;
+		completed: boolean;
+		remainingGoals: {
+			enduranceRun: number;
+		};
+	};
+	lastUpdatedAt: number;
+}
+
 export type WeeklyGoalsCollectionDocument = {
 	id: string;
 

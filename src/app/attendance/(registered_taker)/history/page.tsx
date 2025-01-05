@@ -2,10 +2,12 @@ import WeekRangeNav from "src/components/attendance_records/WeekRangeNav";
 import ThirtyMinutesSessionsProgress from "src/components/attendance_records/ThirtyMinutesSessionsProgress";
 import NormalLongSessionsProgress from "src/components/attendance_records/NormalLongSessionsProgress";
 import EnduranceRunsProgress from "src/components/attendance_records/EnduranceRunsProgress";
+import YearlyStreakView from "src/components/attendance_records/YearlyStreakView/YearlyStreakView";
 import getWeekRange, { type WeekRange } from "src/helpers/weekRange";
 import groupActivities from "src/helpers/activities/groupActivities";
 import query_getTakerFromCookies from "../../../../server/queries/query_getTakerFromCookies";
 import action_resetTaker from "../../../../server/actions/action_resetTaker";
+import { query_getSelectedYear } from "../../../../server/actions/action_handleSelectYear";
 import type { ActivitiesCollectionDocument } from "src/server/collections";
 import getDB from "src/server/db";
 import { ActivitiesCollectionName } from "src/server/collections";
@@ -51,6 +53,7 @@ export default async function HistoryPage({
 	const weekRange = await getWeekRange(weekOffset);
 
 	const taker = await query_getTakerFromCookies();
+	const selectedYear = await query_getSelectedYear();
 
 	// Get attendance data for the current user
 	const attendanceData = await query_getAthleteAttendanceData(
@@ -122,6 +125,8 @@ export default async function HistoryPage({
 					groupedActivities={groupedActivities.normalSessions}
 					goals={WEEKLY_GOALS.normalSession}
 				/>
+
+				<YearlyStreakView year={selectedYear} />
 			</div>
 		</main>
 	);
