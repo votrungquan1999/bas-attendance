@@ -1,7 +1,8 @@
 import * as DatePicker from "./DatePicker";
 import { CreateForm, FormActions } from "./practice_list.ui";
-import { action_createSummerPractice } from "src/server/actions/action_createSummerPractice";
+import { action_createSummerPractice } from "src/app/admin/summer-attendance/action_createSummerPractice";
 import * as Form from "@radix-ui/react-form";
+import * as SubmitButton from "src/components/behaviros/SubmitButton";
 
 export function CreatePracticeForm() {
 	return (
@@ -21,18 +22,12 @@ export function CreatePracticeForm() {
 				</Form.Field>
 
 				<FormActions>
-					<button
-						type="submit"
-						className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-					>
-						Create Practice
-					</button>
-					<button
-						type="reset"
-						className="border border-gray-300 hover:border-gray-400 text-gray-700 px-4 py-2 rounded-md font-medium transition-colors"
-					>
-						Clear
-					</button>
+					<SubmitButton.Root>
+						<SubmitButton.SubmitMessage>
+							Create Practice
+						</SubmitButton.SubmitMessage>
+						<SubmitButton.PendingMessage>Creating…</SubmitButton.PendingMessage>
+					</SubmitButton.Root>
 				</FormActions>
 			</Form.Root>
 		</CreateForm>
