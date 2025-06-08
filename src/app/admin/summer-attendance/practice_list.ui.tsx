@@ -57,29 +57,31 @@ export function PracticeList({ children }: { children: ReactNode }) {
 
 export function PracticeListItem({ children }: { children: ReactNode }) {
 	return (
-		<div className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
+		<div className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md">
 			{children}
 		</div>
 	);
 }
 
 export function PracticeHeader({ children }: { children: ReactNode }) {
-	return (
-		<div className="flex justify-between items-start mb-2">{children}</div>
-	);
+	return <div className="flex justify-between items-center">{children}</div>;
 }
 
 export function PracticeInfo({ children }: { children: ReactNode }) {
-	return <div>{children}</div>;
+	return <div className="flex-1 min-w-0">{children}</div>;
 }
 
 export function PracticeActions({ children }: { children: ReactNode }) {
-	return <div className="flex gap-2">{children}</div>;
+	return (
+		<div className="flex items-center gap-2 flex-shrink-0">{children}</div>
+	);
 }
 
 export function PracticeStats({ children }: { children: ReactNode }) {
 	return (
-		<div className="flex gap-4 text-sm text-gray-500 mt-2">{children}</div>
+		<div className="flex items-center gap-4 text-sm text-gray-500 mt-2">
+			{children}
+		</div>
 	);
 }
 
@@ -93,4 +95,44 @@ export function FormField({ children }: { children: ReactNode }) {
 
 export function FormActions({ children }: { children: ReactNode }) {
 	return <div className="flex gap-2 pt-2">{children}</div>;
+}
+
+// Practice List Item Components
+export function PracticeDate({ children }: { children: ReactNode }) {
+	return (
+		<div className="text-lg font-semibold text-gray-900 truncate">
+			{children}
+		</div>
+	);
+}
+
+export function PracticeUpdatedDate({ children }: { children: ReactNode }) {
+	return <div className="text-sm text-gray-500 truncate">{children}</div>;
+}
+
+export function PracticeAttendanceCount({ children }: { children: ReactNode }) {
+	return (
+		<div className="flex items-center text-sm text-gray-600 whitespace-nowrap">
+			{children}
+		</div>
+	);
+}
+
+export function PracticeStatusBadge({ children }: { children: ReactNode }) {
+	return (
+		<span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 whitespace-nowrap">
+			{children}
+		</span>
+	);
+}
+
+export function PracticeViewButton({ children }: { children: ReactNode }) {
+	return (
+		<button
+			type="button"
+			className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors whitespace-nowrap"
+		>
+			{children}
+		</button>
+	);
 }

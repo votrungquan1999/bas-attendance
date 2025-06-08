@@ -56,3 +56,44 @@ export type AchievementCollectionDocument = {
 };
 
 export type WeekId = Brand<string, "WeekId">;
+
+// Summer Practices Collection
+export const SummerPracticesCollectionName = "summer_practices";
+
+export type SummerPracticesCollectionDocument = {
+	id: string;
+	// date is in format: "YYYY-MM-DD" (e.g., "2024-07-15")
+	date: string;
+	attendance_data: {
+		athletes: SummerAttendanceRecord[];
+	};
+	created_at: number;
+	updated_at: number;
+};
+
+export type BusySummerAttendanceRecord = {
+	athlete_id: string;
+	registered: false;
+	reason: string;
+};
+
+export type ShowedSummerAttendanceRecord = {
+	athlete_id: string;
+	registered: true;
+	showed: true;
+	tracking: {
+		late: boolean;
+		leave_early: boolean;
+	};
+};
+
+export type NoShowSummerAttendanceRecord = {
+	athlete_id: string;
+	registered: true;
+	showed: false;
+};
+
+export type SummerAttendanceRecord =
+	| BusySummerAttendanceRecord
+	| ShowedSummerAttendanceRecord
+	| NoShowSummerAttendanceRecord;
