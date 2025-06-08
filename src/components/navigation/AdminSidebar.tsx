@@ -1,4 +1,4 @@
-import { BarChart3, Settings, ArrowLeft } from "lucide-react";
+import { BarChart3, Settings, ArrowLeft, Sun } from "lucide-react";
 import { AdminNavLink } from "./AdminNavLink";
 
 export default function AdminSidebar() {
@@ -32,6 +32,12 @@ export default function AdminSidebar() {
 									icon={<BarChart3 className="h-4 w-4" />}
 								>
 									Attendance Summary
+								</AdminNavLink>
+								<AdminNavLink
+									href="/admin/summer-attendance"
+									icon={<Sun className="h-4 w-4" />}
+								>
+									Summer Attendance
 								</AdminNavLink>
 								<AdminNavLink
 									href="/admin/settings"
