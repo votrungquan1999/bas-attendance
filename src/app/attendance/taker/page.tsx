@@ -5,6 +5,10 @@ import {
 	ComboboxGroup,
 	ComboboxItem,
 	ComboboxPopover,
+	ComboboxValue,
+	ComboboxInput,
+	ComboboxEmpty,
+	ComboboxList,
 } from "src/shadcn/components/behaviors/comboBox";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -34,36 +38,37 @@ export default async function TakerPage() {
 						handleSelectItem={action_handleSelectTaker}
 					>
 						<ComboboxPopover>
-							<ComboboxTrigger
-								className="w-full transition-all hover:border-slate-400 focus:ring-2 focus:ring-slate-200"
-								placeholder={
-									<span className="text-slate-500">Select your name...</span>
-								}
-							/>
-							<ComboboxContent
-								className="max-h-[300px] overflow-y-auto rounded-md border border-slate-200 bg-white shadow-lg"
-								inputPlaceholder="Type to search..."
-								emptyNode={
+							<ComboboxTrigger className="w-full transition-all hover:border-slate-400 focus:ring-2 focus:ring-slate-200">
+								<ComboboxValue
+									placeholder={
+										<span className="text-slate-500">Select your name...</span>
+									}
+								/>
+							</ComboboxTrigger>
+							<ComboboxContent className="max-h-[300px] overflow-y-auto rounded-md border border-slate-200 bg-white shadow-lg">
+								<ComboboxInput placeholder="Type to search..." />
+								<ComboboxEmpty>
 									<div className="p-4 text-center text-slate-500">
 										No matching names found
 									</div>
-								}
-							>
-								<ComboboxGroup>
-									{takers.map((taker) => {
-										const nonAccentName = toNonAccentVietnamese(taker.value);
+								</ComboboxEmpty>
+								<ComboboxList>
+									<ComboboxGroup>
+										{takers.map((taker) => {
+											const nonAccentName = toNonAccentVietnamese(taker.value);
 
-										return (
-											<ComboboxItem
-												key={taker.id}
-												value={`${taker.id}-${taker.value}-${nonAccentName}`}
-												className="cursor-pointer px-4 py-2 hover:bg-slate-100"
-											>
-												{taker.value}
-											</ComboboxItem>
-										);
-									})}
-								</ComboboxGroup>
+											return (
+												<ComboboxItem
+													key={taker.id}
+													value={`${taker.id}-${taker.value}-${nonAccentName}`}
+													className="cursor-pointer px-4 py-2 hover:bg-slate-100"
+												>
+													{taker.value}
+												</ComboboxItem>
+											);
+										})}
+									</ComboboxGroup>
+								</ComboboxList>
 							</ComboboxContent>
 						</ComboboxPopover>
 					</ComboboxRoot>

@@ -6,6 +6,8 @@ import {
 	ChevronsUpDown,
 	LoaderCircleIcon,
 } from "lucide-react";
+import { Slot } from "@radix-ui/react-slot";
+import type { ButtonHTMLAttributes } from "react";
 
 import { cn } from "src/shadcn/lib/utils";
 import {
@@ -151,13 +153,44 @@ export function ComboboxPopover({ children }: { children: React.ReactNode }) {
 }
 
 export function ComboboxTrigger({
-	placeholder,
+	children,
+	asChild = false,
 	className,
+	...props
+}: {
+	children: React.ReactNode;
+	asChild?: boolean;
+} & ButtonHTMLAttributes<HTMLButtonElement>) {
+	const { open } = useState();
+
+	const Comp = asChild ? Slot : "button";
+
+	return (
+		<PopoverTrigger asChild>
+			<Comp
+				type="button"
+				// biome-ignore lint/a11y/useSemanticElements: use combobox here, select can not search items
+				role="combobox"
+				aria-controls="combobox-content"
+				aria-expanded={open}
+				className={cn(
+					"w-[200px] justify-between flex flex-row items-center border border-slate-200 rounded-md px-2 py-1 text-slate-800",
+					className,
+				)}
+				{...props}
+			>
+				{children}
+			</Comp>
+		</PopoverTrigger>
+	);
+}
+
+export function ComboboxValue({
+	placeholder,
 }: {
 	placeholder: React.ReactNode;
-	className?: string;
 }) {
-	const { isPending, isSuccess, open, selectedItemDisplay } = useState();
+	const { isPending, isSuccess, selectedItemDisplay } = useState();
 	const dispatch = useDispatch();
 
 	useEffect(() => {
@@ -173,60 +206,59 @@ export function ComboboxTrigger({
 	}, [isSuccess, dispatch]);
 
 	return (
-		<PopoverTrigger asChild>
-			<button
-				type="button"
-				// biome-ignore lint/a11y/useSemanticElements: use combobox here, select can not search items
-				role="combobox"
-				aria-controls="combobox-content"
-				aria-expanded={open}
+		<>
+			<p
 				className={cn(
-					"w-[200px] justify-between flex flex-row items-center border border-slate-200 rounded-md px-2 py-1 text-slate-800",
-					className,
+					"flex flex-row gap-2 items-center",
+					isPending && "animate-pulse",
 				)}
 			>
-				<p
-					className={cn(
-						"flex flex-row gap-2 items-center",
-						isPending && "animate-pulse",
-					)}
-				>
-					{selectedItemDisplay ? selectedItemDisplay : placeholder}
+				{selectedItemDisplay ? selectedItemDisplay : placeholder}
 
-					{isPending && (
-						<LoaderCircleIcon className="h-4 w-4 animate-spin text-slate-500" />
-					)}
+				{isPending && (
+					<LoaderCircleIcon className="h-4 w-4 animate-spin text-slate-500" />
+				)}
 
-					{isSuccess && <CheckIcon className="h-4 w-4 text-emerald-500" />}
-				</p>
+				{isSuccess && <CheckIcon className="h-4 w-4 text-emerald-500" />}
+			</p>
 
-				<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-			</button>
-		</PopoverTrigger>
+			<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+		</>
 	);
 }
 
 export function ComboboxContent({
 	children,
-	inputPlaceholder,
-	emptyNode,
 	className,
 }: {
 	children: React.ReactNode;
-	inputPlaceholder: string;
-	emptyNode: React.ReactNode;
 	className?: string;
 }) {
 	return (
 		<PopoverContent className={cn("p-0 bg-white", className)}>
-			<Command>
-				<CommandInput placeholder={inputPlaceholder} />
-				<CommandEmpty>{emptyNode}</CommandEmpty>
-
-				<CommandList>{children}</CommandList>
-			</Command>
+			<Command>{children}</Command>
 		</PopoverContent>
 	);
+}
+
+export function ComboboxInput({
+	placeholder,
+}: {
+	placeholder: string;
+}) {
+	return <CommandInput placeholder={placeholder} />;
+}
+
+export function ComboboxEmpty({
+	children,
+}: {
+	children: React.ReactNode;
+}) {
+	return <CommandEmpty>{children}</CommandEmpty>;
+}
+
+export function ComboboxList({ children }: { children: React.ReactNode }) {
+	return <CommandList>{children}</CommandList>;
 }
 
 export function ComboboxGroup({ children }: { children: React.ReactNode }) {
