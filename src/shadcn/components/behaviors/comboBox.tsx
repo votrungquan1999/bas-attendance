@@ -23,8 +23,19 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "src/shadcn/components/ui/popover";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "src/shadcn/components/ui/tooltip";
 import { createReducerContext } from "src/components/reducerContext";
 import { createContext, useContext, useEffect, useTransition } from "react";
+
+type RegisteredItem = {
+	value: string;
+	display: React.ReactNode;
+};
 
 type ActionType =
 	| {
@@ -35,8 +46,15 @@ type ActionType =
 	  }
 	| {
 			action: "select_item";
-			itemKey: string;
-			itemDisplay: React.ReactNode;
+			itemValue: string;
+	  }
+	| {
+			action: "register_item";
+			item: RegisteredItem;
+	  }
+	| {
+			action: "unregister_item";
+			itemValue: string;
 	  }
 	| {
 			action: "finished_action_select_item";
@@ -47,16 +65,18 @@ type ActionType =
 
 type StateType = {
 	open: boolean;
-	selectedItemKey: string;
-	selectedItemDisplay: React.ReactNode;
+	multiple: boolean;
+	selectedItemValues: string[];
+	registeredItems: RegisteredItem[];
 	isPending: boolean;
 	isSuccess: boolean;
 };
 
 const initialState: StateType = {
 	open: false,
-	selectedItemKey: "",
-	selectedItemDisplay: null,
+	multiple: false,
+	selectedItemValues: [],
+	registeredItems: [],
 	isPending: false,
 	isSuccess: false,
 };
@@ -70,13 +90,55 @@ const { ReducerContextProvider, useDispatch, useState } = createReducerContext<
 			return { ...state, open: true };
 		case "close_combobox":
 			return { ...state, open: false };
-		case "select_item":
+		case "select_item": {
+			const isAlreadySelected = state.selectedItemValues.includes(
+				action.itemValue,
+			);
+
+			if (state.multiple) {
+				if (isAlreadySelected) {
+					// Remove item in multiple mode
+					return {
+						...state,
+						isPending: true,
+						selectedItemValues: state.selectedItemValues.filter(
+							(value) => value !== action.itemValue,
+						),
+					};
+				}
+				// Add item in multiple mode - keep combobox open
+				return {
+					...state,
+					isPending: true,
+					selectedItemValues: [...state.selectedItemValues, action.itemValue],
+				};
+			}
+			// Single selection - close combobox
 			return {
 				...state,
 				open: false,
 				isPending: true,
-				selectedItemKey: action.itemKey,
-				selectedItemDisplay: action.itemDisplay,
+				selectedItemValues: [action.itemValue],
+			};
+		}
+		case "register_item": {
+			// Don't add if already exists
+			const exists = state.registeredItems.some(
+				(item) => item.value === action.item.value,
+			);
+			if (exists) return state;
+
+			return {
+				...state,
+				registeredItems: [...state.registeredItems, action.item],
+			};
+		}
+		case "unregister_item":
+			return {
+				...state,
+				registeredItems: state.registeredItems.filter(
+					(item) => item.value !== action.itemValue,
+				),
 			};
 		case "finished_action_select_item":
 			return {
@@ -93,7 +155,7 @@ const { ReducerContextProvider, useDispatch, useState } = createReducerContext<
 }, initialState);
 
 const ActionSelectItemContext = createContext<
-	((key: string) => Promise<void>) | null
+	((values: string[]) => Promise<void>) | null
 >(null);
 
 function useActionSelectItem() {
@@ -106,26 +168,75 @@ function useActionSelectItem() {
 	return context;
 }
 
+export function useRegisterItem(value: string, display: React.ReactNode) {
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		console.log("register_item", value, display);
+		dispatch({
+			action: "register_item",
+			item: { value, display },
+		});
+
+		return () => {
+			dispatch({
+				action: "unregister_item",
+				itemValue: value,
+			});
+		};
+	}, [dispatch, value, display]);
+}
+
+function HiddenInput({ name, multiple }: { name: string; multiple: boolean }) {
+	const state = useState();
+
+	return (
+		<select
+			name={name}
+			multiple={multiple}
+			value={
+				multiple ? state.selectedItemValues : state.selectedItemValues[0] || ""
+			}
+			onChange={() => {}} // Controlled by the combobox
+			style={{ display: "none" }}
+			tabIndex={-1}
+			aria-hidden="true"
+		>
+			{state.selectedItemValues.map((value) => (
+				<option key={value} value={value}>
+					{value}
+				</option>
+			))}
+		</select>
+	);
+}
+
 export function ComboboxRoot({
 	children,
-	defaultSelectedItemKey,
+	defaultSelectedItemValues = [],
 	handleSelectItem,
+	multiple = false,
+	name,
 }: {
 	children: React.ReactNode;
-	defaultSelectedItemKey: string;
-	handleSelectItem: (key: string) => Promise<void>;
+	defaultSelectedItemValues?: string[];
+	handleSelectItem: (values: string[]) => Promise<void>;
+	multiple?: boolean;
+	name?: string;
 }) {
 	return (
 		<ActionSelectItemContext.Provider value={handleSelectItem}>
 			<ReducerContextProvider
 				value={{
 					open: false,
-					selectedItemKey: defaultSelectedItemKey,
-					selectedItemDisplay: null,
+					multiple,
+					selectedItemValues: defaultSelectedItemValues,
+					registeredItems: [],
 					isPending: false,
 					isSuccess: false,
 				}}
 			>
+				{name && <HiddenInput name={name} multiple={multiple} />}
 				{children}
 			</ReducerContextProvider>
 		</ActionSelectItemContext.Provider>
@@ -190,7 +301,8 @@ export function ComboboxValue({
 }: {
 	placeholder: React.ReactNode;
 }) {
-	const { isPending, isSuccess, selectedItemDisplay } = useState();
+	const { isPending, isSuccess, selectedItemValues, registeredItems } =
+		useState();
 	const dispatch = useDispatch();
 
 	useEffect(() => {
@@ -205,6 +317,13 @@ export function ComboboxValue({
 		}
 	}, [isSuccess, dispatch]);
 
+	const selectedItems = registeredItems.filter((item) =>
+		selectedItemValues.includes(item.value),
+	);
+
+	const hasSelection = selectedItems.length > 0;
+	const additionalCount = selectedItems.length - 1;
+
 	return (
 		<>
 			<p
@@ -213,7 +332,31 @@ export function ComboboxValue({
 					isPending && "animate-pulse",
 				)}
 			>
-				{selectedItemDisplay ? selectedItemDisplay : placeholder}
+				{hasSelection ? (
+					<span className="flex flex-row gap-1 items-center">
+						{selectedItems[0].display}
+						{additionalCount > 0 && (
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<span className="text-slate-500 bg-slate-100 px-1 rounded text-xs">
+											+{additionalCount}
+										</span>
+									</TooltipTrigger>
+									<TooltipContent>
+										<div className="flex flex-col gap-1">
+											{selectedItems.slice(1).map((item) => (
+												<div key={item.value}>{item.display}</div>
+											))}
+										</div>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+						)}
+					</span>
+				) : (
+					placeholder
+				)}
 
 				{isPending && (
 					<LoaderCircleIcon className="h-4 w-4 animate-spin text-slate-500" />
@@ -274,33 +417,46 @@ export function ComboboxItem({
 	value: string;
 	className?: string;
 }) {
-	const { selectedItemKey } = useState();
+	const state = useState();
+	const { selectedItemValues, multiple } = state;
+
+	// Register this item
+	useRegisterItem(value, children);
 
 	const dispatch = useDispatch();
-
 	const handleSelectItem = useActionSelectItem();
-
 	const [, startTransition] = useTransition();
+
+	const isSelected = selectedItemValues.includes(value);
 
 	const handleSelect = () => {
 		dispatch({
 			action: "select_item",
-			itemKey: value,
-			itemDisplay: children,
+			itemValue: value,
 		});
 
 		startTransition(async () => {
 			dispatch({ action: "finished_action_select_item" });
 
-			await handleSelectItem(value);
+			// Calculate the new selected values based on the current state
+			let updatedValues: string[];
+			if (multiple) {
+				if (isSelected) {
+					updatedValues = selectedItemValues.filter((v) => v !== value);
+				} else {
+					updatedValues = [...selectedItemValues, value];
+				}
+			} else {
+				updatedValues = [value];
+			}
+
+			await handleSelectItem(updatedValues);
 		});
 	};
 
 	return (
 		<CommandItem onSelect={handleSelect} value={value} className={className}>
-			<Check
-				className={cn("mr-2 h-4 w-4", value !== selectedItemKey && "invisible")}
-			/>
+			<Check className={cn("mr-2 h-4 w-4", !isSelected && "invisible")} />
 			{children}
 		</CommandItem>
 	);
