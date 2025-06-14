@@ -34,8 +34,11 @@ export default async function TakerPage() {
 
 				<div className="relative w-full">
 					<ComboboxRoot
-						defaultSelectedItemKey="1"
-						handleSelectItem={action_handleSelectTaker}
+						handleSelectItem={async (values: string[]) => {
+							if (values.length > 0) {
+								await action_handleSelectTaker(values[0]);
+							}
+						}}
 					>
 						<ComboboxPopover>
 							<ComboboxTrigger className="w-full transition-all hover:border-slate-400 focus:ring-2 focus:ring-slate-200">
