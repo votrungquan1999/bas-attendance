@@ -1,0 +1,151 @@
+import { ArrowLeft, X } from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
+import query_getSummerPracticeById from "src/server/queries/query_getSummerPracticeById";
+import query_getEligibleAthletes from "src/app/admin/attendance/by-week/query_getEligibleAthletes";
+import {
+	PracticeDetailLayout,
+	PracticeDetailHeader,
+	BackLink,
+	PracticeTitle,
+	PracticeTitleText,
+	PracticeSubtitle,
+	AttendanceManagementCard,
+	AttendanceTabs,
+	AttendanceTabsList,
+	AttendanceTabsTrigger,
+	AttendanceTabsContent,
+	TabContentHeader,
+	TabContentTitle,
+	TabContentDescription,
+	TabContentBody,
+	AthleteSelectionSection,
+	SectionTitle,
+	RegisteredAthletesList,
+	BusyAthletesList,
+	RegisteredAthleteItem,
+	BusyAthleteItem,
+	AthleteLabel,
+	TabFooter,
+	SaveButton,
+} from "./practice_detail.ui";
+import { RegistrationProvider, type Athlete } from "./RegistrationContext";
+import {
+	AthleteCombobox,
+	RegisterCount,
+	EmptyRegisteredWrapper,
+	HasRegisteredWrapper,
+	AllRegisteredWrapper,
+	HasUnregisteredWrapper,
+	RegisteredAthleteWrapper,
+	BusyAthleteWrapper,
+	RemoveButton,
+	BusyReasonInput,
+} from "./registration.ui";
+import { NoShowTab } from "./no-show.ui";
+import { SummaryTab } from "./summary.ui";
+import {
+	ComboboxItem,
+	ComboboxContent,
+	ComboboxGroup,
+	ComboboxPopover,
+	ComboboxTrigger,
+	ComboboxValue,
+	ComboboxInput,
+	ComboboxEmpty,
+	ComboboxList,
+} from "src/shadcn/components/behaviors/comboBox";
+import toNonAccentVietnamese from "src/helpers/toNonAccentVietnamese";
+
+interface PracticeDetailPageProps {
+	params: Promise<{
+		practiceId: string;
+	}>;
+}
+
+export default async function PracticeDetailPage(
+	props: PracticeDetailPageProps,
+) {
+	const params = await props.params;
+	const practiceId = params.practiceId;
+
+	const practice = await query_getSummerPracticeById(practiceId);
+
+	if (!practice) {
+		return (
+			<PracticeDetailLayout>
+				<PracticeDetailHeader>
+					<Link href="/admin/summer-attendance">
+						<BackLink>
+							<ArrowLeft />
+							Back to Practices
+						</BackLink>
+					</Link>
+				</PracticeDetailHeader>
+				<PracticeTitle>
+					<PracticeTitleText>Practice Not Found</PracticeTitleText>
+					<PracticeSubtitle>
+						The practice you&apos;re looking for doesn&apos;t exist.
+					</PracticeSubtitle>
+				</PracticeTitle>
+			</PracticeDetailLayout>
+		);
+	}
+
+	const practiceDate = new Date(practice.date);
+	const formattedDate = practiceDate.toLocaleDateString("en-US", {
+		weekday: "long",
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	});
+
+	return (
+		<PracticeDetailLayout>
+			<PracticeDetailHeader>
+				<Link href="/admin/summer-attendance">
+					<BackLink>
+						<ArrowLeft />
+						Back to Practices
+					</BackLink>
+				</Link>
+			</PracticeDetailHeader>
+
+			<PracticeTitle>
+				<PracticeTitleText>Summer Practice</PracticeTitleText>
+				<PracticeSubtitle>{formattedDate}</PracticeSubtitle>
+			</PracticeTitle>
+
+			<AttendanceManagementCard>
+				<AttendanceTabs defaultValue="registration">
+					<AttendanceTabsList>
+						<AttendanceTabsTrigger value="registration">
+							Registration
+						</AttendanceTabsTrigger>
+						<AttendanceTabsTrigger value="no-show">
+							No Show Marking
+						</AttendanceTabsTrigger>
+						<AttendanceTabsTrigger value="summary">
+							Attendance Summary
+						</AttendanceTabsTrigger>
+					</AttendanceTabsList>
+
+					<AttendanceTabsContent value="registration">
+						<Suspense fallback={<div>Loading athletes...</div>}>
+							<RegistrationTabContent />
+						</Suspense>
+					</AttendanceTabsContent>
+
+					<AttendanceTabsContent value="no-show">
+						<NoShowTab />
+					</AttendanceTabsContent>
+
+					<AttendanceTabsContent value="summary">
+						<SummaryTab />
+					</AttendanceTabsContent>
+				</AttendanceTabs>
+			</AttendanceManagementCard>
+		</PracticeDetailLayout>
+	);
+}
+

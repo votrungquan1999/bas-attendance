@@ -87,8 +87,6 @@ export function Root({
 							setOpen(false);
 						}}
 						captionLayout="dropdown"
-						fromYear={2024}
-						toYear={2030}
 					/>
 				</PopoverContent>
 			</Popover>
