@@ -53,10 +53,6 @@ type ActionType =
 			item: RegisteredItem;
 	  }
 	| {
-			action: "unregister_item";
-			itemValue: string;
-	  }
-	| {
 			action: "finished_action_select_item";
 	  }
 	| {
@@ -122,24 +118,24 @@ const { ReducerContextProvider, useDispatch, useState } = createReducerContext<
 			};
 		}
 		case "register_item": {
-			// Don't add if already exists
+			// replace if already exists
 			const exists = state.registeredItems.some(
 				(item) => item.value === action.item.value,
 			);
-			if (exists) return state;
+			if (exists) {
+				return {
+					...state,
+					registeredItems: state.registeredItems.map((item) =>
+						item.value === action.item.value ? action.item : item,
+					),
+				};
+			}
 
 			return {
 				...state,
 				registeredItems: [...state.registeredItems, action.item],
 			};
 		}
-		case "unregister_item":
-			return {
-				...state,
-				registeredItems: state.registeredItems.filter(
-					(item) => item.value !== action.itemValue,
-				),
-			};
 		case "finished_action_select_item":
 			return {
 				...state,
@@ -172,18 +168,10 @@ export function useRegisterItem(value: string, display: React.ReactNode) {
 	const dispatch = useDispatch();
 
 	useEffect(() => {
-		console.log("register_item", value, display);
 		dispatch({
 			action: "register_item",
 			item: { value, display },
 		});
-
-		return () => {
-			dispatch({
-				action: "unregister_item",
-				itemValue: value,
-			});
-		};
 	}, [dispatch, value, display]);
 }
 
@@ -377,6 +365,16 @@ export function ComboboxContent({
 	children: React.ReactNode;
 	className?: string;
 }) {
+	const { open } = useState();
+
+	if (!open) {
+		return (
+			<div className="hidden">
+				<Command>{children}</Command>
+			</div>
+		);
+	}
+
 	return (
 		<PopoverContent className={cn("p-0 bg-white", className)}>
 			<Command>{children}</Command>
@@ -457,7 +455,7 @@ export function ComboboxItem({
 	return (
 		<CommandItem onSelect={handleSelect} value={value} className={className}>
 			<Check className={cn("mr-2 h-4 w-4", !isSelected && "invisible")} />
-			{children}
+			<div data-value={`combobox-item-${value}`}>{children}</div>
 		</CommandItem>
 	);
 }
