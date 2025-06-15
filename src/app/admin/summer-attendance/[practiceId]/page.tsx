@@ -149,3 +149,114 @@ export default async function PracticeDetailPage(
 	);
 }
 
+async function RegistrationTabContent() {
+	const eligibleTakers = await query_getEligibleAthletes();
+	const allAthletes: Athlete[] = eligibleTakers.map((taker) => ({
+		id: taker.id,
+		name: taker.value,
+	}));
+
+	return (
+		<RegistrationProvider>
+			<TabContentHeader>
+				<TabContentTitle>Athlete Registration</TabContentTitle>
+				<TabContentDescription>
+					Select which athletes are registered for this practice session
+				</TabContentDescription>
+			</TabContentHeader>
+
+			<TabContentBody>
+				<AthleteSelectionSection>
+					<SectionTitle>Add Athletes to Practice</SectionTitle>
+					<AthleteCombobox>
+						<ComboboxPopover>
+							<ComboboxTrigger className="w-full">
+								<ComboboxValue placeholder="Search and select athletes..." />
+							</ComboboxTrigger>
+							<ComboboxContent className="w-full">
+								<ComboboxInput placeholder="Type athlete name..." />
+								<ComboboxEmpty>No athletes found</ComboboxEmpty>
+								<ComboboxList>
+									<ComboboxGroup>
+										{allAthletes.map((athlete) => {
+											const nonAccentName = toNonAccentVietnamese(athlete.name);
+
+											return (
+												<ComboboxItem
+													key={athlete.id}
+													value={`${athlete.id}-${nonAccentName}`}
+												>
+													{athlete.name}
+												</ComboboxItem>
+											);
+										})}
+									</ComboboxGroup>
+								</ComboboxList>
+							</ComboboxContent>
+						</ComboboxPopover>
+					</AthleteCombobox>
+				</AthleteSelectionSection>
+
+				<AthleteSelectionSection>
+					<SectionTitle>
+						Registered Athletes (<RegisterCount />)
+					</SectionTitle>
+					<RegisteredAthletesList>
+						<EmptyRegisteredWrapper>
+							<p className="text-gray-500 text-sm text-center py-4">
+								No athletes registered yet. Use the search above to add
+								athletes.
+							</p>
+						</EmptyRegisteredWrapper>
+						<HasRegisteredWrapper>
+							{allAthletes.map((athlete) => (
+								<RegisteredAthleteWrapper
+									key={athlete.id}
+									athleteId={athlete.id}
+								>
+									<RegisteredAthleteItem>
+										<AthleteLabel>{athlete.name}</AthleteLabel>
+										<RemoveButton athleteId={athlete.id}>
+											<button
+												type="button"
+												className="flex items-center gap-2 text-red-500"
+											>
+												<X className="size-4" />
+												Remove
+											</button>
+										</RemoveButton>
+									</RegisteredAthleteItem>
+								</RegisteredAthleteWrapper>
+							))}
+						</HasRegisteredWrapper>
+					</RegisteredAthletesList>
+				</AthleteSelectionSection>
+
+				<AthleteSelectionSection>
+					<SectionTitle>Busy Athletes (Optional Reasons)</SectionTitle>
+					<BusyAthletesList>
+						<AllRegisteredWrapper allAthletes={allAthletes}>
+							<p className="text-gray-500 text-sm text-center py-4">
+								All athletes are registered for this practice.
+							</p>
+						</AllRegisteredWrapper>
+						<HasUnregisteredWrapper allAthletes={allAthletes}>
+							{allAthletes.map((athlete) => (
+								<BusyAthleteWrapper key={athlete.id} athleteId={athlete.id}>
+									<BusyAthleteItem>
+										<AthleteLabel>{athlete.name}</AthleteLabel>
+										<BusyReasonInput athleteId={athlete.id} />
+									</BusyAthleteItem>
+								</BusyAthleteWrapper>
+							))}
+						</HasUnregisteredWrapper>
+					</BusyAthletesList>
+				</AthleteSelectionSection>
+			</TabContentBody>
+
+			<TabFooter>
+				<SaveButton>Save Registration</SaveButton>
+			</TabFooter>
+		</RegistrationProvider>
+	);
+}
