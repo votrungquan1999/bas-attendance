@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { utilsHomeHref } from "./utils/href";
 
 export default function Home() {
 	return (
@@ -17,6 +18,12 @@ export default function Home() {
 				className="hidden sm:block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
 			>
 				Admin Panel
+			</Link>
+			<Link
+				href={utilsHomeHref()}
+				className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+			>
+				Basketball Utils
 			</Link>
 		</main>
 	);
