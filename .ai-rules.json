@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "agent": "claude-code",
+  "categories": [
+    "component-architecture",
+    "database-patterns",
+    "knowledge-base",
+    "meta-rules",
+    "react-hooks",
+    "react-server-components",
+    "styling-tailwind",
+    "testing-guidelines",
+    "typescript-conventions",
+    "url-state-management"
+  ],
+  "workflows": [],
+  "skills": [
+    "ai-kanban-track-session",
+    "ai-kanban-work-card",
+    "bdd-design",
+    "code-refactoring",
+    "commit-plan",
+    "context7",
+    "create-implementation-plan",
+    "create-pr",
+    "feature-development-workflow",
+    "find-patterns",
+    "knowledge-base",
+    "orchestrated-feature-dev",
+    "repo-knowledge",
+    "review-changes",
+    "root-cause-analysis",
+    "setup-private-skills",
+    "structured-brainstorming",
+    "tdd-design",
+    "test-quality-reviewer",
+    "validate-pr-comments",
+    "web-search",
+    "pr-comment-triage"
+  ],
+  "hooks": [
+    "kanban-track"
+  ],
+  "scope": [
+    "bas-attendance",
+    "personal"
+  ]
+}

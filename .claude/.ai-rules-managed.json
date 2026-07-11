@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "managedHooks": {
+    "kanban-track": {
+      "event": "UserPromptSubmit",
+      "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/kanban-track/kanban-track.mjs",
+      "scriptPath": ".claude/hooks/kanban-track/kanban-track.mjs"
+    }
+  }
+}
