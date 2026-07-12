@@ -101,7 +101,7 @@ export function CountdownStartStopButton() {
 			size="lg"
 			disabled={disabled}
 			onClick={isIdle ? start : stop}
-			className="size-48 rounded-full text-3xl font-semibold"
+			className="size-72 rounded-full text-4xl font-semibold"
 		>
 			{isIdle ? "Start" : "Stop"}
 		</Button>
