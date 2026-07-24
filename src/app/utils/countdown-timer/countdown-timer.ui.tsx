@@ -35,18 +35,22 @@ export function CountdownLayout({ children }: { children: ReactNode }) {
  * Shows the remaining time as mm:ss, recoloring when the countdown finishes.
  */
 export function CountdownDisplay() {
-	const { minutes, seconds, isFinished } = useCountdownView();
+	const { minutes, seconds, milliseconds, isFinished } = useCountdownView();
 	const paddedMinutes = String(minutes).padStart(2, "0");
 	const paddedSeconds = String(seconds).padStart(2, "0");
+	const paddedMilliseconds = String(milliseconds).padStart(3, "0");
 
 	return (
 		<p
 			className={cn(
-				"text-6xl font-bold tabular-nums",
+				"text-5xl sm:text-6xl font-bold tabular-nums whitespace-nowrap",
 				isFinished ? "text-destructive" : "text-foreground",
 			)}
 		>
 			{paddedMinutes}:{paddedSeconds}
+			<span className="text-3xl sm:text-4xl align-baseline">
+				.{paddedMilliseconds}
+			</span>
 		</p>
 	);
 }

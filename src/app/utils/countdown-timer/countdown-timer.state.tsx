@@ -10,6 +10,7 @@ interface CountdownView {
 	status: CountdownStatus;
 	minutes: number;
 	seconds: number;
+	milliseconds: number;
 	isIdle: boolean;
 	isRunning: boolean;
 	isFinished: boolean;
@@ -28,8 +29,6 @@ type AudioContextRef = MutableRefObject<AudioContext | null>;
 
 const MS_PER_MINUTE = 60 * 1000;
 const MS_PER_SECOND = 1000;
-// 250ms: frequent enough to catch zero-crossing promptly, cheap enough to idle.
-const TICK_INTERVAL_MS = 250;
 const BEEP_PERIOD_MS = 800;
 const BEEP_DURATION_SECONDS = 0.3;
 const BEEP_FREQUENCY_HZ = 880;
@@ -92,13 +91,16 @@ function CountdownTimerEffects() {
 			return;
 		}
 		lastTickRef.current = Date.now();
-		const intervalId = setInterval(() => {
+		// rAF (not setInterval) so the millisecond display animates at the
+		// screen's refresh rate; Date.now deltas keep it wall-clock accurate.
+		let frameId = requestAnimationFrame(function tick() {
 			const now = Date.now();
 			const elapsedMs = now - lastTickRef.current;
 			lastTickRef.current = now;
 			dispatch({ type: "TICK", payload: elapsedMs });
-		}, TICK_INTERVAL_MS);
-		return () => clearInterval(intervalId);
+			frameId = requestAnimationFrame(tick);
+		});
+		return () => cancelAnimationFrame(frameId);
 	}, [state.status, dispatch]);
 
 	useEffect(() => {
@@ -184,11 +186,13 @@ export function useCountdownView(): CountdownView {
 	const seconds = Math.floor(
 		(state.remainingMs % MS_PER_MINUTE) / MS_PER_SECOND,
 	);
+	const milliseconds = Math.floor(state.remainingMs % MS_PER_SECOND);
 
 	return {
 		status: state.status,
 		minutes,
 		seconds,
+		milliseconds,
 		isIdle: state.status === CountdownStatus.Idle,
 		isRunning: state.status === CountdownStatus.Running,
 		isFinished: state.status === CountdownStatus.Finished,
