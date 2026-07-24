@@ -19,13 +19,13 @@ function parseInputValue(rawValue: string): number {
 }
 
 /**
- * Centers the countdown tool's content, matching the flex pattern already
- * used by the app's root and /utils landing pages.
+ * Centers the countdown tool's content and locks it to the viewport height,
+ * clipping any overflow so rushed taps can't scroll the single-screen tool.
  * @param children - the countdown's title + interactive elements
  */
 export function CountdownLayout({ children }: { children: ReactNode }) {
 	return (
-		<main className="flex flex-col items-center justify-center flex-1 gap-6 px-4 py-10">
+		<main className="flex flex-col items-center justify-center h-dvh overflow-hidden overscroll-none gap-6 px-4 py-10">
 			{children}
 		</main>
 	);
